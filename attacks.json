@@ -1,0 +1,61 @@
+{
+  "EX01-U01": [
+    {"name": "Beam Saber", "timeline": 2, "range": 1, "strength": 4, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Beam Magnum", "timeline": 4, "range": 4, "strength": 8, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "EX01-U02": [
+    {"name": "Armored Frame", "timeline": 2, "range": 1, "strength": 3, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]}
+  ],
+  "EX01-U03": [
+    {"name": "Twin-Barreled Grenade Launcher", "timeline": 2, "range": 3, "strength": 3, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Beam Rifle", "timeline": 4, "range": 5, "strength": 6, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "EX02-U01": [
+    {"name": "Beam Sabers", "timeline": 2, "range": 1, "strength": 3, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Beam Rifle", "timeline": 4, "range": 4, "strength": 6, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "EX02-U02": [
+    {"name": "Beak Foot", "timeline": 2, "range": 3, "strength": 3, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Beam Arquebus", "timeline": 4, "range": 5, "strength": 6, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "EX02-U03": [
+    {"name": "Shackle Claw", "timeline": 2, "range": 2, "strength": 4, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Beam Saber", "timeline": 3, "range": 1, "strength": 7, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "PA01-U01": [
+    {"name": "Beam Saber", "timeline": 2, "range": 1, "strength": 3, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Beam Rifle", "timeline": 3, "range": 3, "strength": 5, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "PA01-U02": [
+    {"name": "240mm Low-Recoil Cannon", "timeline": 2, "range": "SP", "strength": 3, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Beam Rifle", "timeline": 4, "range": 4, "strength": 7, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "PA01-U03": [
+    {"name": "120mm Low-Recoil Cannons", "timeline": 2, "range": 4, "strength": 2, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Quadruple Bop Missile", "timeline": 3, "range": "SP", "strength": 5, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "ST01-U01": [
+    {"name": "Vulcan Guns", "timeline": 2, "range": 2, "strength": 3, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Beam Saber", "timeline": 3, "range": 1, "strength": 6, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "ST01-U02": [
+    {"name": "Beam Saber", "timeline": 2, "range": 1, "strength": 4, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Twin Buster Rifle", "timeline": 4, "range": "SP", "strength": 6, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "ST01-U03": [
+    {"name": "Rex Claws", "timeline": 2, "range": 1, "strength": 3, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Tail Blade", "timeline": 4, "range": 2, "strength": 7, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "ST01-U04": [
+    {"name": "Heat Hawk", "timeline": 2, "range": 1, "strength": 4, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Zaku Bazooka", "timeline": 4, "range": 4, "strength": 7, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "ST01-U05": [
+    {"name": "Heat Rod", "timeline": 2, "range": 2, "strength": 3, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Beam Sword", "timeline": 3, "range": 1, "strength": 7, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ],
+  "ST01-U06": [
+    {"name": "Handguns", "timeline": 3, "range": 2, "strength": 3, "bounds": [0.01875, 0.322751, 0.4775, 0.421517]},
+    {"name": "Burst Saber", "timeline": 4, "range": 1, "strength": 8, "bounds": [0.52, 0.322751, 0.97875, 0.421517]}
+  ]
+}

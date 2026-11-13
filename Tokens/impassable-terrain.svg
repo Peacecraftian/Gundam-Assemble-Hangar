@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Impassable Terrain</title>
+  <defs>
+    <path id="warning" d="M4 32 18 7.75h28L60 32 46 56.25H18Z M11 20l42 24"/>
+    <linearGradient id="enamel" x2="1" y2="1">
+      <stop stop-color="#FF6157"/>
+      <stop offset=".49" stop-color="#FF6157"/>
+      <stop offset="1" stop-color="#D9243C"/>
+    </linearGradient>
+  </defs>
+  <g opacity=".83" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <use href="#warning" stroke="#890027" stroke-width="6.7"/>
+    <use href="#warning" stroke="url(#enamel)" stroke-width="5.3"/>
+  </g>
+</svg>

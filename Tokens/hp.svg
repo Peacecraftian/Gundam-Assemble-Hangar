@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="308" viewBox="0 0 360 308" role="img">
+  <title>HP</title>
+  <defs>
+    <linearGradient id="shell" gradientUnits="userSpaceOnUse" x1="87" y1="0" x2="217" y2="302">
+      <stop stop-color="#929B98"/>
+      <stop offset=".53" stop-color="#55605F"/>
+      <stop offset="1" stop-color="#262D2E"/>
+    </linearGradient>
+    <linearGradient id="glint" gradientUnits="userSpaceOnUse" x1="152" y1="6" x2="211" y2="231">
+      <stop stop-color="#F2EDE0" stop-opacity=".73"/>
+      <stop offset="1" stop-color="#F2EDE0" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="rim" gradientUnits="userSpaceOnUse" x1="133" y1="4" x2="218" y2="294">
+      <stop stop-color="#9EA7A4"/>
+      <stop offset=".56" stop-color="#65716F"/>
+      <stop offset="1" stop-color="#404949"/>
+    </linearGradient>
+    <linearGradient id="face" gradientUnits="userSpaceOnUse" x1="106" y1="28" x2="218" y2="282">
+      <stop stop-color="#30383A"/>
+      <stop offset=".57" stop-color="#242B2D"/>
+      <stop offset="1" stop-color="#1D2426"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <path d="M142 3h76c15 0 27 7 34 21l101 200c7 13 7 27-1 41l-14 23c-6 10-15 14-27 14H49c-12 0-21-4-27-14L8 265c-8-14-8-28-1-41L108 24C115 10 127 3 142 3Z" fill="url(#shell)"/>
+    <path d="M142 4h76c14 0 24 7 30 19l100 201c7 13 7 25 0 37l-14 22c-5 8-12 11-23 11H49c-11 0-18-3-23-11l-14-22c-7-12-7-24 0-37L112 23c6-12 16-19 30-19Z" fill="url(#rim)" stroke="#151A1C" stroke-opacity=".33" stroke-width="1.4"/>
+    <path d="M9 236 113 25c6-12 16-19 29-19h76c13 0 23 7 29 19l49 98" fill="none" stroke="url(#glint)" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M145 20h70c10 0 17 4 22 14l99 199c5 10 5 15 0 24l-13 19q-4 6-13 6H50q-9 0-13-6l-13-19c-5-9-5-14 0-24L123 34c5-10 12-14 22-14Z" fill="url(#face)" stroke="#151A1C" stroke-width="2.4"/>
+    <path d="M21 252l16 23q4 6 13 6h114m32 0h114q9 0 13-6l16-23" fill="none" stroke="#A3ABA5" stroke-opacity=".84" stroke-width="2.3" stroke-linecap="round"/>
+    <path d="M166 282v6q0 2 2 2h24q2 0 2-2v-6Z" fill="#3F4949"/>
+    <path d="M176 277v9m8-9v9" fill="none" stroke="#B0B6AD" stroke-width="3.4" stroke-linecap="round"/>
+  </g>
+  <g fill="#FF6495">
+    <path d="M180 122c-18-33-62-37-83-9-30 42 11 84 83 132 72-48 113-90 83-132-21-28-65-24-83 9Z"/>
+  </g>
+</svg>

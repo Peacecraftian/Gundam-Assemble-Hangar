@@ -1,0 +1,26 @@
+{
+  "EX02-U01A": {
+    "name": "BIT Stave",
+    "image": "img_card_ex02-u01a_en.webp",
+    "parent": "EX02-U01",
+    "hp": 1,
+    "vp": 2,
+    "icon_bounds": [0.825, 0.231, 0.924, 0.312]
+  },
+  "EX02-U02A": {
+    "name": "Corax",
+    "image": "img_card_ex02-u02a_en.webp",
+    "parent": "EX02-U02",
+    "hp": 1,
+    "vp": 2,
+    "icon_bounds": [0.825, 0.231, 0.924, 0.312]
+  },
+  "EX02-U03A": {
+    "name": "Iśvara B Type",
+    "image": "img_card_ex02-u03a_en.webp",
+    "parent": "EX02-U03",
+    "hp": 1,
+    "vp": 2,
+    "icon_bounds": [0.825, 0.231, 0.924, 0.312]
+  }
+}

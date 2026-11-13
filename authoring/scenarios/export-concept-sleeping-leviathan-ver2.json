@@ -1,0 +1,649 @@
+{
+  "id": "local-be2f4f34a85b4c1ab26575becef1180f",
+  "cells": {
+    "01-01": {
+      "terrain": "ground"
+    },
+    "01-02": {
+      "terrain": "ground"
+    },
+    "01-03": {
+      "terrain": "ground"
+    },
+    "01-04": {
+      "terrain": "ground"
+    },
+    "01-05": {
+      "terrain": "ground"
+    },
+    "01-06": {
+      "terrain": "ground"
+    },
+    "01-07": {
+      "terrain": "ground",
+      "token": "upgrade"
+    },
+    "01-08": {
+      "terrain": "ground"
+    },
+    "01-09": {
+      "terrain": "ground"
+    },
+    "01-10": {
+      "terrain": "ground"
+    },
+    "01-11": {
+      "terrain": "ground",
+      "token": "blue_garrison"
+    },
+    "01-12": {
+      "terrain": "ground"
+    },
+    "01-13": {
+      "terrain": "ground"
+    },
+    "01-14": {
+      "terrain": "ground"
+    },
+    "02-01": {
+      "terrain": "ground"
+    },
+    "02-02": {
+      "terrain": "ground"
+    },
+    "02-03": {
+      "terrain": "ground",
+      "token": "red_garrison"
+    },
+    "02-04": {
+      "terrain": "ground"
+    },
+    "02-05": {
+      "terrain": "ground"
+    },
+    "02-06": {
+      "terrain": "ground"
+    },
+    "02-07": {
+      "terrain": "ground",
+      "token": "objective"
+    },
+    "02-08": {
+      "terrain": "ground"
+    },
+    "02-09": {
+      "terrain": "ground"
+    },
+    "02-10": {
+      "terrain": "height1"
+    },
+    "02-11": {
+      "terrain": "height1",
+      "token": "upgrade"
+    },
+    "02-12": {
+      "terrain": "ground"
+    },
+    "02-13": {
+      "terrain": "ground"
+    },
+    "03-01": {
+      "terrain": "ground"
+    },
+    "03-02": {
+      "terrain": "ground"
+    },
+    "03-03": {
+      "terrain": "ground"
+    },
+    "03-04": {
+      "terrain": "ground"
+    },
+    "03-05": {
+      "terrain": "height1",
+      "token": "blue_garrison"
+    },
+    "03-06": {
+      "terrain": "height1",
+      "token": "energy"
+    },
+    "03-07": {
+      "terrain": "ground"
+    },
+    "03-08": {
+      "terrain": "ground"
+    },
+    "03-09": {
+      "terrain": "ground"
+    },
+    "03-10": {
+      "terrain": "ground"
+    },
+    "03-11": {
+      "terrain": "ground"
+    },
+    "03-12": {
+      "terrain": "ground"
+    },
+    "03-13": {
+      "terrain": "ground"
+    },
+    "03-14": {
+      "terrain": "ground"
+    },
+    "04-01": {
+      "terrain": "ground"
+    },
+    "04-02": {
+      "terrain": "ground"
+    },
+    "04-03": {
+      "terrain": "height1",
+      "token": "upgrade"
+    },
+    "04-04": {
+      "terrain": "ground"
+    },
+    "04-05": {
+      "terrain": "ground"
+    },
+    "04-06": {
+      "terrain": "ground"
+    },
+    "04-07": {
+      "terrain": "height1",
+      "token": "blue_garrison"
+    },
+    "04-08": {
+      "terrain": "ground"
+    },
+    "04-09": {
+      "terrain": "ground"
+    },
+    "04-10": {
+      "terrain": "height1",
+      "token": "red_garrison"
+    },
+    "04-11": {
+      "terrain": "ground"
+    },
+    "04-12": {
+      "terrain": "ground"
+    },
+    "04-13": {
+      "terrain": "ground"
+    },
+    "05-01": {
+      "terrain": "ground"
+    },
+    "05-02": {
+      "terrain": "ground"
+    },
+    "05-03": {
+      "terrain": "ground"
+    },
+    "05-04": {
+      "terrain": "height1"
+    },
+    "05-05": {
+      "terrain": "ground"
+    },
+    "05-06": {
+      "terrain": "ground"
+    },
+    "05-07": {
+      "terrain": "height1"
+    },
+    "05-08": {
+      "terrain": "height1"
+    },
+    "05-09": {
+      "terrain": "ground"
+    },
+    "05-10": {
+      "terrain": "ground",
+      "token": "upgrade"
+    },
+    "05-11": {
+      "terrain": "height1"
+    },
+    "05-12": {
+      "terrain": "ground"
+    },
+    "05-13": {
+      "terrain": "ground"
+    },
+    "05-14": {
+      "terrain": "ground"
+    },
+    "06-01": {
+      "terrain": "ground"
+    },
+    "06-02": {
+      "terrain": "ground"
+    },
+    "06-03": {
+      "terrain": "ground"
+    },
+    "06-04": {
+      "terrain": "ground"
+    },
+    "06-05": {
+      "terrain": "ground"
+    },
+    "06-06": {
+      "terrain": "height1"
+    },
+    "06-07": {
+      "terrain": "height1"
+    },
+    "06-08": {
+      "terrain": "height1"
+    },
+    "06-09": {
+      "terrain": "ground"
+    },
+    "06-10": {
+      "terrain": "ground"
+    },
+    "06-11": {
+      "terrain": "ground"
+    },
+    "06-12": {
+      "terrain": "ground"
+    },
+    "06-13": {
+      "terrain": "ground"
+    },
+    "07-01": {
+      "terrain": "ground"
+    },
+    "07-02": {
+      "terrain": "ground"
+    },
+    "07-03": {
+      "terrain": "ground"
+    },
+    "07-04": {
+      "terrain": "ground"
+    },
+    "07-05": {
+      "terrain": "ground"
+    },
+    "07-06": {
+      "terrain": "height1",
+      "token": "red_garrison"
+    },
+    "07-07": {
+      "terrain": "height2"
+    },
+    "07-08": {
+      "terrain": "height2"
+    },
+    "07-09": {
+      "terrain": "height1",
+      "token": "objective"
+    },
+    "07-10": {
+      "terrain": "ground"
+    },
+    "07-11": {
+      "terrain": "height1",
+      "token": "red_garrison"
+    },
+    "07-12": {
+      "terrain": "ground"
+    },
+    "07-13": {
+      "terrain": "ground"
+    },
+    "07-14": {
+      "terrain": "ground"
+    },
+    "08-01": {
+      "terrain": "height1",
+      "token": "red_base"
+    },
+    "08-02": {
+      "terrain": "ground"
+    },
+    "08-03": {
+      "terrain": "ground"
+    },
+    "08-04": {
+      "terrain": "ground"
+    },
+    "08-05": {
+      "terrain": "height1"
+    },
+    "08-06": {
+      "terrain": "height2"
+    },
+    "08-07": {
+      "terrain": "height2",
+      "token": "upgrade"
+    },
+    "08-08": {
+      "terrain": "height2"
+    },
+    "08-09": {
+      "terrain": "height1"
+    },
+    "08-10": {
+      "terrain": "ground"
+    },
+    "08-11": {
+      "terrain": "ground"
+    },
+    "08-12": {
+      "terrain": "ground"
+    },
+    "08-13": {
+      "terrain": "height1",
+      "token": "blue_base"
+    },
+    "09-01": {
+      "terrain": "ground"
+    },
+    "09-02": {
+      "terrain": "ground"
+    },
+    "09-03": {
+      "terrain": "ground"
+    },
+    "09-04": {
+      "terrain": "height1",
+      "token": "blue_garrison"
+    },
+    "09-05": {
+      "terrain": "ground"
+    },
+    "09-06": {
+      "terrain": "height1",
+      "token": "objective"
+    },
+    "09-07": {
+      "terrain": "height2"
+    },
+    "09-08": {
+      "terrain": "height2"
+    },
+    "09-09": {
+      "terrain": "height1",
+      "token": "blue_garrison"
+    },
+    "09-10": {
+      "terrain": "ground"
+    },
+    "09-11": {
+      "terrain": "ground"
+    },
+    "09-12": {
+      "terrain": "ground"
+    },
+    "09-13": {
+      "terrain": "ground"
+    },
+    "09-14": {
+      "terrain": "ground"
+    },
+    "10-01": {
+      "terrain": "ground"
+    },
+    "10-02": {
+      "terrain": "ground"
+    },
+    "10-03": {
+      "terrain": "ground"
+    },
+    "10-04": {
+      "terrain": "ground"
+    },
+    "10-05": {
+      "terrain": "ground"
+    },
+    "10-06": {
+      "terrain": "height1"
+    },
+    "10-07": {
+      "terrain": "height1"
+    },
+    "10-08": {
+      "terrain": "height1"
+    },
+    "10-09": {
+      "terrain": "ground"
+    },
+    "10-10": {
+      "terrain": "ground"
+    },
+    "10-11": {
+      "terrain": "ground"
+    },
+    "10-12": {
+      "terrain": "ground"
+    },
+    "10-13": {
+      "terrain": "ground"
+    },
+    "11-01": {
+      "terrain": "ground"
+    },
+    "11-02": {
+      "terrain": "ground"
+    },
+    "11-03": {
+      "terrain": "ground"
+    },
+    "11-04": {
+      "terrain": "height1"
+    },
+    "11-05": {
+      "terrain": "ground",
+      "token": "upgrade"
+    },
+    "11-06": {
+      "terrain": "ground"
+    },
+    "11-07": {
+      "terrain": "height1"
+    },
+    "11-08": {
+      "terrain": "height1"
+    },
+    "11-09": {
+      "terrain": "ground"
+    },
+    "11-10": {
+      "terrain": "ground"
+    },
+    "11-11": {
+      "terrain": "height1"
+    },
+    "11-12": {
+      "terrain": "ground"
+    },
+    "11-13": {
+      "terrain": "ground"
+    },
+    "11-14": {
+      "terrain": "ground"
+    },
+    "12-01": {
+      "terrain": "ground"
+    },
+    "12-02": {
+      "terrain": "ground"
+    },
+    "12-03": {
+      "terrain": "ground"
+    },
+    "12-04": {
+      "terrain": "height1",
+      "token": "blue_garrison"
+    },
+    "12-05": {
+      "terrain": "ground"
+    },
+    "12-06": {
+      "terrain": "ground"
+    },
+    "12-07": {
+      "terrain": "height1",
+      "token": "red_garrison"
+    },
+    "12-08": {
+      "terrain": "ground"
+    },
+    "12-09": {
+      "terrain": "ground"
+    },
+    "12-10": {
+      "terrain": "ground"
+    },
+    "12-11": {
+      "terrain": "height1",
+      "token": "upgrade"
+    },
+    "12-12": {
+      "terrain": "ground"
+    },
+    "12-13": {
+      "terrain": "ground"
+    },
+    "13-01": {
+      "terrain": "ground"
+    },
+    "13-02": {
+      "terrain": "ground"
+    },
+    "13-03": {
+      "terrain": "ground"
+    },
+    "13-04": {
+      "terrain": "ground"
+    },
+    "13-05": {
+      "terrain": "ground"
+    },
+    "13-06": {
+      "terrain": "ground"
+    },
+    "13-07": {
+      "terrain": "ground"
+    },
+    "13-08": {
+      "terrain": "ground"
+    },
+    "13-09": {
+      "terrain": "height1",
+      "token": "energy"
+    },
+    "13-10": {
+      "terrain": "height1",
+      "token": "red_garrison"
+    },
+    "13-11": {
+      "terrain": "ground"
+    },
+    "13-12": {
+      "terrain": "ground"
+    },
+    "13-13": {
+      "terrain": "ground"
+    },
+    "13-14": {
+      "terrain": "ground"
+    },
+    "14-01": {
+      "terrain": "ground"
+    },
+    "14-02": {
+      "terrain": "ground"
+    },
+    "14-03": {
+      "terrain": "height1",
+      "token": "upgrade"
+    },
+    "14-04": {
+      "terrain": "height1"
+    },
+    "14-05": {
+      "terrain": "ground"
+    },
+    "14-06": {
+      "terrain": "ground"
+    },
+    "14-07": {
+      "terrain": "ground",
+      "token": "objective"
+    },
+    "14-08": {
+      "terrain": "ground"
+    },
+    "14-09": {
+      "terrain": "ground"
+    },
+    "14-10": {
+      "terrain": "ground"
+    },
+    "14-11": {
+      "terrain": "ground",
+      "token": "blue_garrison"
+    },
+    "14-12": {
+      "terrain": "ground"
+    },
+    "14-13": {
+      "terrain": "ground"
+    },
+    "15-01": {
+      "terrain": "ground"
+    },
+    "15-02": {
+      "terrain": "ground"
+    },
+    "15-03": {
+      "terrain": "ground"
+    },
+    "15-04": {
+      "terrain": "ground",
+      "token": "red_garrison"
+    },
+    "15-05": {
+      "terrain": "ground"
+    },
+    "15-06": {
+      "terrain": "ground"
+    },
+    "15-07": {
+      "terrain": "ground"
+    },
+    "15-08": {
+      "terrain": "ground",
+      "token": "upgrade"
+    },
+    "15-09": {
+      "terrain": "ground"
+    },
+    "15-10": {
+      "terrain": "ground"
+    },
+    "15-11": {
+      "terrain": "ground"
+    },
+    "15-12": {
+      "terrain": "ground"
+    },
+    "15-13": {
+      "terrain": "ground"
+    },
+    "15-14": {
+      "terrain": "ground"
+    }
+  },
+  "name": "Operation Sleeping Leviathan VER2",
+  "location": "African Coastline",
+  "overview": "The walls of a massive fortress rise from a jagged ocean coast, its silhouette etched against the dying glow of the sun. Within its stone shell lies a dormant leviathan, a weapon once built to sweep entire fleets into silence beneath the waves. Once a symbol of unbreakable power, it now lingers as a whisper of possibility, entombed in stone and memory, waiting to be claimed once more.\n\nIntelligence reports enemy Mobile Suits advancing on the location of an abandoned coastal fortress, intent on breaching its walls and securing a powerful weapon within. Control of the weapon will give the enemy control of the surrounding ocean and tip the balance of power in their favor. All available forces are to advance on the fortress immediately to secure key strong points and prevent enemy incursion. We cannot allow the weapon to fall into enemy hands.",
+  "objectives": "Secure key positions within and around the fortress to reinforce defenses. Each position controlled at the end of a Phase is worth victory points as outlined below.\n\n• Positions within the fortress in the center of the board are each worth 5 victory points.\n\n• Positions outside the fortress on the left and right sides of the board are each worth 8 victory points."
+}

@@ -1,0 +1,17 @@
+{
+  "EX01-U01": {"name": "Unicorn Gundam (Destroy Mode)", "title": "Laplace's Guardian", "hp": 14, "vp": 10, "timeline": 3, "image": "img_card_front_ex01-u01_en.webp"},
+  "EX01-U02": {"name": "Torohachi", "title": "Petite Mobile Suit", "hp": 8, "vp": 5, "timeline": 1, "image": "img_card_front_ex01-u02_en.webp", "mass_produced": true},
+  "EX01-U03": {"name": "Delta Plus", "title": "Rapid Response", "hp": 11, "vp": 7, "timeline": 2, "image": "img_card_front_ex01-u03_en.webp"},
+  "EX02-U01": {"name": "Gundam Aerial", "title": "Protective Heroine", "hp": 16, "vp": 10, "timeline": 1, "image": "img_card_front_ex02-u01_en.webp"},
+  "EX02-U02": {"name": "Gundam Pharact", "title": "Silent Hunter", "hp": 12, "vp": 7, "timeline": 2, "image": "img_card_front_ex02-u02_en.webp"},
+  "EX02-U03": {"name": "Darilbalde", "title": "Frontline Duelist", "hp": 13, "vp": 8, "timeline": 3, "image": "img_card_front_ex02-u03_en.webp"},
+  "PA01-U01": {"name": "Gundam", "title": "Elite Mobile Suit", "hp": 17, "vp": 10, "timeline": 1, "image": "img_card_front_pa01-u01_en.webp"},
+  "PA01-U02": {"name": "Guncannon", "title": "In Position", "hp": 12, "vp": 7, "timeline": 2, "image": "img_card_front_pa01-u02_en.webp"},
+  "PA01-U03": {"name": "Guntank", "title": "Battlefield Bombarder", "hp": 13, "vp": 7, "timeline": 2, "image": "img_card_front_pa01-u03_en.webp"},
+  "ST01-U01": {"name": "Gundam", "title": "Legendary Hero", "hp": 15, "vp": 8, "timeline": 2, "image": "img_card_front_st01-u01_en.webp"},
+  "ST01-U02": {"name": "Wing Gundam Zero (EW)", "title": "Wing of Destruction", "hp": 12, "vp": 9, "timeline": 3, "image": "img_card_front_st01-u02_en.webp"},
+  "ST01-U03": {"name": "Gundam Barbatos Lupus Rex", "title": "Final Stand", "hp": 17, "vp": 10, "timeline": 2, "image": "img_card_front_st01-u03_en.webp"},
+  "ST01-U04": {"name": "Char’s Zaku II", "title": "Fast Encounter", "hp": 12, "vp": 7, "timeline": 2, "image": "img_card_front_st01-u04_en.webp"},
+  "ST01-U05": {"name": "Gundam Epyon (EW)", "title": "Crimson Cataclysm", "hp": 15, "vp": 9, "timeline": 3, "image": "img_card_front_st01-u05_en.webp"},
+  "ST01-U06": {"name": "Gundam Vidar", "title": "Cold Justice", "hp": 13, "vp": 7, "timeline": 1, "image": "img_card_front_st01-u06_en.webp"}
+}

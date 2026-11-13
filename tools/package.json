@@ -1,0 +1,8 @@
+{
+  "name": "gundam-hangar-asset-tools",
+  "private": true,
+  "dependencies": {
+    "cannon-es": "0.20.0",
+    "playwright": "1.65.0"
+  }
+}

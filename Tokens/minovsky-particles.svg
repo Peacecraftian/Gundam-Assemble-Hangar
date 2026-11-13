@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Minovsky Particles</title>
+  <defs>
+    <path id="hex" d="M1 32 16.5 5.15h31L63 32 47.5 58.85h-31Z"/>
+    <clipPath id="tile"><use href="#hex"/></clipPath>
+    <radialGradient id="glass" cx=".47" cy=".46" r=".64">
+      <stop offset=".22" stop-color="#041528" stop-opacity="0"/>
+      <stop offset=".67" stop-color="#041528" stop-opacity=".08"/>
+      <stop offset=".87" stop-color="#601761" stop-opacity=".26"/>
+      <stop offset="1" stop-color="#1C92A7" stop-opacity=".39"/>
+    </radialGradient>
+    <linearGradient id="rim" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF88A9" stop-opacity=".66"/>
+      <stop offset=".46" stop-color="#BFC3C6" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#77D6C1" stop-opacity=".72"/>
+    </linearGradient>
+    <radialGradient id="bloom">
+      <stop offset="0" stop-color="#FFFFE4" stop-opacity=".96"/>
+      <stop offset=".21" stop-color="#77D6C1" stop-opacity=".65"/>
+      <stop offset=".54" stop-color="#1C92A7" stop-opacity=".30"/>
+      <stop offset="1" stop-color="#601761" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="streak">
+      <stop offset="0" stop-color="#C03B94" stop-opacity="0"/>
+      <stop offset=".46" stop-color="#77D6C1" stop-opacity=".82"/>
+      <stop offset=".55" stop-color="#FFFFE4" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#77D6C1" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#tile)">
+    <use href="#hex" fill="url(#glass)" stroke="url(#rim)" stroke-width="4.2"/>
+    <circle cx="32" cy="32" r="23.3" fill="none" stroke="#BFC3C6" stroke-width=".85" stroke-opacity=".38"/>
+    <path d="M10 29a22.2 22.2 0 0 1 28-18m16 25a22.2 22.2 0 0 1-20 18"
+          fill="none" stroke="url(#rim)" stroke-width="1.55" stroke-linecap="round"/>
+    <g fill="none" stroke-width=".75">
+      <circle cx="15" cy="47" r="3.4" stroke="#C03B94" stroke-opacity=".61"/>
+      <circle cx="23" cy="41" r="2.1" stroke="#77D6C1" stroke-opacity=".59"/>
+      <circle cx="34" cy="31" r="1.5" stroke="#BFC3C6" stroke-opacity=".59"/>
+    </g>
+    <g fill="#FFFFE4" stroke="#293B49" stroke-width=".53">
+      <circle cx="19" cy="10" r=".87"/><circle cx="26" cy="9" r=".63"/><circle cx="34" cy="11" r=".85"/>
+      <circle cx="46" cy="10.5" r=".56"/><circle cx="51" cy="13" r=".87"/><circle cx="14" cy="16" r=".64"/>
+      <circle cx="20" cy="18.5" r="1.22"/><circle cx="28" cy="15.8" r=".65"/><circle cx="34" cy="20.1" r=".63"/>
+      <circle cx="9.5" cy="24.5" r=".82"/><circle cx="14.2" cy="26.5" r=".63"/><circle cx="25" cy="24.4" r=".93"/>
+      <circle cx="49.7" cy="24.5" r=".63"/><circle cx="55" cy="27" r="1.1"/><circle cx="58" cy="31.2" r=".68"/>
+      <circle cx="8.5" cy="34" r=".8"/><circle cx="18" cy="33.5" r=".81"/><circle cx="24" cy="32" r=".66"/>
+      <circle cx="45.4" cy="33.6" r=".9"/><circle cx="50.6" cy="34.8" r=".65"/><circle cx="54.9" cy="38.6" r=".82"/>
+      <circle cx="13.8" cy="39.7" r="1.06"/><circle cx="19.8" cy="44.8" r=".55"/><circle cx="27.8" cy="46.6" r=".78"/>
+      <circle cx="38.9" cy="40.3" r=".55"/><circle cx="45.1" cy="43.5" r="1.12"/><circle cx="50" cy="47.6" r=".69"/>
+      <circle cx="20.4" cy="52.9" r=".71"/><circle cx="26.8" cy="54.1" r="1.05"/><circle cx="34" cy="51.7" r=".57"/>
+      <circle cx="39.5" cy="55" r=".79"/><circle cx="45.1" cy="51.2" r=".59"/>
+    </g>
+    <circle cx="43" cy="19" r="14.5" fill="url(#bloom)"/>
+    <path d="M23 19h39" stroke="url(#streak)" stroke-width="1.25" stroke-linecap="round"/>
+    <path d="m38.5 14.5 9 9m0-9-9 9" stroke="#BFC3C6" stroke-opacity=".76" stroke-width=".64" stroke-linecap="round"/>
+    <path d="m43 10 .99 7.9L54 19l-10.01 1.13L43 28l-1.12-7.87L32 19l9.88-1.1Z"
+          fill="#FFFFE4" stroke="#293B49" stroke-width=".58" stroke-linejoin="round"/>
+  </g>
+</svg>

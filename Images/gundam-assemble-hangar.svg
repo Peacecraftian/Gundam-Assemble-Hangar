@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="168" viewBox="0 0 640 168" role="img" aria-labelledby="title description">
+  <title id="title">Gundam Assemble Hangar</title>
+  <desc id="description">A graphite maintenance gantry shelters an amber V-fin on a clipped enamel nameplate.</desc>
+  <path fill="#E2DACA" stroke="#655F53" stroke-width="4"
+        d="M25 2H615L638 25V143L615 166H25L2 143V25Z"/>
+
+  <g id="gantry">
+    <path fill="#242A29" fill-rule="evenodd"
+          d="M43 30H70V40H178V30H205L207 42H215V64H208L213 121H220L227 129V139H175V129L181 121L178 77L167 66H81L70 77L67 121L73 129V139H21V129L28 121H35L40 64H33V42H41Z
+             M74 46H114L94 59H74Z
+             M105 59L124 46L143 59Z
+             M134 46H174V59H154Z"/>
+    <path fill="#FFB762" stroke="#805323" stroke-width="2.5" stroke-linejoin="round"
+          d="M79 89L115 104L118 100H130L133 104L169 89L137 119L133 128H115L111 119Z"/>
+  </g>
+
+  <g id="wordmark" fill="#242A29" fill-rule="evenodd">
+    <!-- GUNDAM ASSEMBLE -->
+    <g transform="translate(236 30)">
+      <path d="M5 0H17L22 5V10H15V7H7V27H15V21H11V14H22V29L17 34H5L0 29V5Z"/>
+      <path transform="translate(26)" d="M0 0H7V27H15V0H22V29L17 34H5L0 29Z"/>
+      <path transform="translate(52)" d="M0 0H7L15 18V0H22V34H15L7 16V34H0Z"/>
+      <path transform="translate(78)" d="M0 0H16L22 6V28L16 34H0Z M7 7V27H15V7Z"/>
+      <path transform="translate(104)" d="M7 0H15L22 34H15L14 27H8L7 34H0Z M9 20H13L11 8Z"/>
+      <path transform="translate(130)" d="M0 0H7L11 11L15 0H22V34H15V14L11 23L7 14V34H0Z"/>
+      <path transform="translate(165)" d="M7 0H15L22 34H15L14 27H8L7 34H0Z M9 20H13L11 8Z"/>
+      <path transform="translate(191)" d="M5 0H17L22 5V10H15V7H7V14H17L22 19V29L17 34H5L0 29V24H7V27H15V21H5L0 16V5Z"/>
+      <path transform="translate(217)" d="M5 0H17L22 5V10H15V7H7V14H17L22 19V29L17 34H5L0 29V24H7V27H15V21H5L0 16V5Z"/>
+      <path transform="translate(243)" d="M0 0H22V7H7V14H19V21H7V27H22V34H0Z"/>
+      <path transform="translate(269)" d="M0 0H7L11 11L15 0H22V34H15V14L11 23L7 14V34H0Z"/>
+      <path transform="translate(295)" d="M0 0H17L22 5V13L18 17L22 21V29L17 34H0Z M7 7V14H15V7Z M7 21V27H15V21Z"/>
+      <path transform="translate(321)" d="M0 0H7V27H22V34H0Z"/>
+      <path transform="translate(347)" d="M0 0H22V7H7V14H19V21H7V27H22V34H0Z"/>
+    </g>
+    <!-- HANGAR -->
+    <g transform="translate(236 73)">
+      <path d="M0 0H15V25H38V0H53V66H38V40H15V66H0Z"/>
+      <path transform="translate(63)" d="M17 0H37L55 66H39L36 53H18L15 66H0Z M21 39H33L27 15Z"/>
+      <path transform="translate(126)" d="M0 0H15L39 38V0H54V66H39L15 28V66H0Z"/>
+      <path transform="translate(189)" d="M9 0H45L54 9V20H39V15H15V51H39V41H27V28H54V57L45 66H9L0 57V9Z"/>
+      <path transform="translate(252)" d="M17 0H37L55 66H39L36 53H18L15 66H0Z M21 39H33L27 15Z"/>
+      <path transform="translate(315)" d="M0 0H44L53 9V32L44 41H39L55 66H37L22 41H15V66H0Z M15 15V27H38V15Z"/>
+    </g>
+  </g>
+</svg>

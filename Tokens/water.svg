@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Water</title>
+  <defs>
+    <path id="hex" d="M1 32 16.5 5.15h31L63 32 47.5 58.85h-31Z"/>
+    <clipPath id="tile"><use href="#hex"/></clipPath>
+    <linearGradient id="wash" x2="1" y2="1">
+      <stop stop-color="#1C92A7" stop-opacity=".43"/>
+      <stop offset="1" stop-color="#033E5E" stop-opacity=".31"/>
+    </linearGradient>
+    <linearGradient id="rim" x2="1" y2="1">
+      <stop stop-color="#BFC3C6" stop-opacity=".80"/>
+      <stop offset=".54" stop-color="#77D6C1" stop-opacity=".72"/>
+      <stop offset="1" stop-color="#1C92A7" stop-opacity=".76"/>
+    </linearGradient>
+    <linearGradient id="ripple" x2="0" y2="1">
+      <stop stop-color="#77D6C1" stop-opacity=".12"/>
+      <stop offset=".46" stop-color="#77D6C1" stop-opacity=".60"/>
+      <stop offset="1" stop-color="#BFC3C6" stop-opacity=".22"/>
+    </linearGradient>
+  </defs>
+  <use href="#hex" fill="url(#wash)"/>
+  <g clip-path="url(#tile)" fill="none">
+    <path d="M-2 30c12-10 13-4 22-9 8-5 9-15 19-16M6 50c8-14 13-12 21-17 7-4 11-14 22-17l13-3M22 63c3-10 8-16 17-20 12-5 14-12 26-11M10 17c8 4 9 10 16 12 8 3 16-3 24 1 7 4 6 12 15 15M24 10c6 6 9 11 15 10 6-1 11-6 18-5M9 43c5-2 11 1 16 6 4 5 10 6 17 2l16-4"
+          stroke="url(#ripple)" stroke-width="1.4" stroke-linecap="round"/>
+    <use href="#hex" stroke="url(#rim)" stroke-width="5.3"/>
+    <path d="M4.6 32 18.3 8.3h27.4L59.4 32 45.7 55.7H18.3Z"
+          stroke="#1C92A7" stroke-opacity=".66" stroke-width="1"/>
+  </g>
+</svg>
