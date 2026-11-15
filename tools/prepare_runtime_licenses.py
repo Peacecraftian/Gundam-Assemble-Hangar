@@ -46,7 +46,8 @@ def prepare_runtime_licenses(destination):
         'it contains no build-machine paths. These files do not replace upstream copyright notices.\n\n'
         'Additional packaged notices: ../Fonts/OFL-*.txt, ../Images/Navigation/LICENSE-*.txt,\n'
         '../Dice/LICENSE-Cannon-es.txt, ../Dice/licenses/, ../mini_racer-*.dist-info/licenses/,\n'
-        'and ../_tk_data/license.terms. The application code license is ../LICENSE.\n'
+        'and ../_tk_data/license.terms. The original application source code license is ../LICENSE.\n'
+        'See ../NOTICE.md for license scope, official game material ownership, and asset notices.\n'
         'Official game artwork and other third-party assets are not licensed by the application MIT license.\n',
         encoding='utf-8')
     return manifest

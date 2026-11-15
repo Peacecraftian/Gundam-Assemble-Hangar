@@ -93,4 +93,6 @@ Search by printed name or card number, then click a result or press **Enter** to
 
 ## About the project
 
-Hangar is an unofficial fan-made companion. Gundam Assemble names, card artwork, and game assets belong to their respective owners. Hangar’s source code is available under the [MIT License](LICENSE). For source setup, builds, asset credits, and scenario bundling, see the [development guide](docs/DEVELOPMENT.md).
+Hangar is an unofficial fan-made companion and is not affiliated with or endorsed by the owners of Gundam or Gundam Assemble. The [MIT License](LICENSE) applies only to Hangar’s original source code.
+
+Official artwork, card images, rules, scenario text, names, logos, and other game material remain the property of their respective owners and are not covered by Hangar’s MIT license. Including or adapting these materials does not transfer ownership or grant permission to reuse or redistribute them. Third-party software, fonts, and icons retain their own licenses. See the [license and asset notices](NOTICE.md) for details, and the [development guide](docs/DEVELOPMENT.md) for source setup and builds.

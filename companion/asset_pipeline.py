@@ -28,7 +28,7 @@ STATIC_FILES = (
     'scenarios.json',
     'attacks.json', 'Dice/physics.js',
     *(f'Dice/licenses/{name}.txt' for name in ('V8', 'Strongtalk', 'fdlibm', 'ICU')),
-    'LICENSE',
+    'LICENSE', 'NOTICE.md',
     'Fonts/ChakraPetch-Bold.ttf', 'Fonts/SairaStencilOne-Regular.ttf',
     'Fonts/OFL-Chakra-Petch.txt', 'Fonts/OFL-Saira-Stencil-One.txt',
     'Images/gundam-assemble-hangar.png', 'Images/gundam-assemble-hangar.ico',
