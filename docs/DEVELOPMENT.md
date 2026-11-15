@@ -4,6 +4,8 @@
 
 Use the full Windows x64 distribution of Python 3.13 with Tcl/Tk.
 
+Run these commands from the active checkout, not the retained archive. Check `git remote get-url origin` before starting work; the archived repository ends in `-Archive.git`. Keep the virtual environment, generated assets and build output in the active checkout. `build.ps1` defaults to this checkout's `.venv` when it exists and refuses an archived workspace or an interpreter located inside one.
+
 ```powershell
 python -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements.txt
@@ -11,7 +13,7 @@ npm ci --prefix tools
 .venv\Scripts\python.exe -m tools.prepare_assets
 .venv\Scripts\python.exe -m unittest discover -s tests -v
 .venv\Scripts\python.exe run_companion.py
-.\build.ps1 -Python .venv\Scripts\python.exe
+.\build.ps1
 ```
 
 The build validates the catalog and writes the portable folder and ZIP under `dist`. To test without modifying your match, launch with `--save-path` and a path to a separate SQLite file.
@@ -40,6 +42,8 @@ The Windows build includes the catalog. Bundled scenarios appear in **Battlefiel
 Operation Sleeping Leviathan retains the archived VER2 export as its source. The runtime catalog rotates its terrain and tokens clockwise to match the board orientation in Entry Set Scenario 01, pages 34–35.
 
 Operation Azure Fang uses the user's archived REV2 export while retaining the official ID `official-azure-fang` and its unsuffixed display name. See [its revision history](../authoring/scenarios/azure-fang-revisions.md) for the changed hexes and preserved original source.
+
+Operation Lockdown is bundled from the user’s saved Battlefield scenario with stable ID `official-lockdown`. Its briefing, Urban palette, terrain and numbered objectives are preserved in the [archived source and inclusion record](../authoring/scenarios/lockdown-revisions.md).
 
 Battlefield’s elevation fills, legend swatches, and hex outlines use exact colors from the [Pineapple 32 reference](../Images/palette_pineapple-32-32x.png).
 

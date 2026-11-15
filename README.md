@@ -26,7 +26,7 @@ Choose a bundled or custom scenario, or **No scenario** to track a match indepen
 
 ![Operation Azure Fang in the Jungle palette, with numbered objectives, Water overlays, and rules for the selected hex](docs/screenshots/battlefield.png)
 
-Set up **Operation Sleeping Leviathan**, **Operation Azure Fang**, or a custom scenario using the mission briefing and the 203-hex board. Terrain colors show elevation; Special Terrain decals and gameplay tokens layer above it. Select a hex to inspect its contents and associated Special Terrain rules. The scenario chosen in Mission Sortie follows the match when you resume it.
+Set up **Operation Sleeping Leviathan**, **Operation Azure Fang**, **Operation Lockdown**, or a custom scenario using the mission briefing and the 203-hex board. Terrain colors show elevation; Special Terrain decals and gameplay tokens layer above it. Select a hex to inspect its contents and associated Special Terrain rules. The scenario chosen in Mission Sortie follows the match when you resume it.
 
 Preview five environments—**Desert, Jungle, Space, Urban, and Underwater**—with Ground Level, Height 1, and Height 2 colors. Each scenario loads its saved palette.
 

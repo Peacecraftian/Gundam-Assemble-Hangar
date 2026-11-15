@@ -1,5 +1,11 @@
 # Gundam Assemble repository instructions
 
+## Active workspace and publishing
+
+Use the active Gundam Assemble Hangar checkout for all development, tests, asset preparation and builds. Set the command's working directory explicitly to this checkout. Confirm the Git root and origin before editing; a checkout whose origin ends in `Gundam-Assemble-Hangar-Archive.git` or contains `.ARCHIVED-WORKSPACE` is historical reference only. Do not develop, build, commit or push there, or use its Python environment. Read-only reference access and explicitly requested archive maintenance are permitted.
+
+Use this checkout's `.venv` and keep generated files under its `.build` and `dist` directories. On Windows, `build.ps1` automatically prefers `.venv/Scripts/python.exe`. Keep development changes and builds local until the user explicitly requests a commit, push or release update. Never merge or restore archived Git history into the active repository.
+
 ## Interface and runtime compatibility
 
 Use the Hangar orange, dark outline and soft glow for pointer shapes, with appropriate hotspots. The text caret is a thin orange line. Regenerate Windows cursors with `python -m tools.render_cursor`. Keep published card IDs and original image filenames stable: saved matches reference them. Preserve rule validation, revision conflicts and the 20-edit undo limit.

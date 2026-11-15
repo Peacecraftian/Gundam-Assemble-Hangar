@@ -1,6 +1,13 @@
-param([string]$Python = "python")
+param([string]$Python = "")
 
 $ErrorActionPreference = "Stop"
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot ".ARCHIVED-WORKSPACE")) {
+    throw "This is an archived workspace. Build from the active Gundam Assemble Hangar checkout."
+}
+if (-not $Python) {
+    $localPython = Join-Path $PSScriptRoot ".venv/Scripts/python.exe"
+    $Python = if (Test-Path -LiteralPath $localPython) { $localPython } else { "python" }
+}
 $previousCache = $env:PYINSTALLER_CONFIG_DIR
 Push-Location -LiteralPath $PSScriptRoot
 try {
@@ -8,6 +15,11 @@ try {
 import sys
 import sysconfig
 import tkinter
+from pathlib import Path
+
+for runtime in (Path(sys.prefix), Path(sys.base_prefix)):
+    assert not any((parent / '.ARCHIVED-WORKSPACE').exists() for parent in (runtime, *runtime.parents)), \
+        "Python belongs to an archived workspace. Use this checkout's environment."
 
 from PIL import Image, ImageFont
 

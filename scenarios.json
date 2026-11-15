@@ -1356,5 +1356,670 @@
         "terrain": "ground"
       }
     }
+  },
+  {
+    "id": "official-lockdown",
+    "source": "authoring/scenarios/export-official-lockdown.json",
+    "revision": "2026-11-14",
+    "name": "Operation Lockdown",
+    "location": "A Metropolitan City Center",
+    "overview": "Rain lashes down as a metropolis transforms into a contested battlefield. Towering skyscrapers collapse into rubble while city squares harden into entrenched positions, thick with concrete dust and the acrid scent of spent ammunition. Once a symbol of prosperity, the city now stands as both prize and graveyard—its shattered streets the stage for the war’s next decisive clash.\n\nFighting has erupted in the city center, where towering spires of concrete and steel conceal vital positions. Command has identified key districts—transport hubs, power relays, and fortified plazas—that must be secured to maintain control of the city. Enemy forces are converging rapidly, and intelligence reports indicate tight quarters as you approach the city center. Control of these districts is crucial: failure will mean loss of the city.",
+    "objectives": "Secure critical positions (Objective tokens) on the outskirts of the city and within the city center following the standard rules for contesting and controlling Objectives. Each position you control at the end of a Phase will award victory points as described below.\n\n• The central position (1) at the heart of the city is worth 8 victory points.\n\n• Each of the positions on the city outskirts (2, 3, 4) are worth 5 victory points.",
+    "palette": "urban",
+    "cells": {
+      "01-01": {
+        "terrain": "ground"
+      },
+      "01-02": {
+        "terrain": "ground"
+      },
+      "01-03": {
+        "terrain": "ground"
+      },
+      "01-04": {
+        "terrain": "ground"
+      },
+      "01-05": {
+        "terrain": "ground"
+      },
+      "01-06": {
+        "terrain": "ground"
+      },
+      "01-07": {
+        "terrain": "ground"
+      },
+      "01-08": {
+        "terrain": "ground",
+        "token": "red_base"
+      },
+      "01-09": {
+        "terrain": "ground"
+      },
+      "01-10": {
+        "terrain": "ground"
+      },
+      "01-11": {
+        "terrain": "ground"
+      },
+      "01-12": {
+        "terrain": "ground"
+      },
+      "01-13": {
+        "terrain": "ground"
+      },
+      "01-14": {
+        "terrain": "ground"
+      },
+      "01-15": {
+        "terrain": "ground"
+      },
+      "02-01": {
+        "terrain": "height1"
+      },
+      "02-02": {
+        "terrain": "height1"
+      },
+      "02-03": {
+        "terrain": "ground"
+      },
+      "02-04": {
+        "terrain": "height1"
+      },
+      "02-05": {
+        "terrain": "ground"
+      },
+      "02-06": {
+        "terrain": "ground"
+      },
+      "02-07": {
+        "terrain": "ground"
+      },
+      "02-08": {
+        "terrain": "ground"
+      },
+      "02-09": {
+        "terrain": "ground"
+      },
+      "02-10": {
+        "terrain": "ground"
+      },
+      "02-11": {
+        "terrain": "ground"
+      },
+      "02-12": {
+        "terrain": "ground"
+      },
+      "02-13": {
+        "terrain": "ground"
+      },
+      "02-14": {
+        "terrain": "ground"
+      },
+      "02-15": {
+        "terrain": "ground"
+      },
+      "03-01": {
+        "terrain": "height1",
+        "token": "upgrade"
+      },
+      "03-02": {
+        "terrain": "height1",
+        "token": "objective",
+        "objective_number": 2
+      },
+      "03-03": {
+        "terrain": "height1",
+        "token": "red_garrison"
+      },
+      "03-04": {
+        "terrain": "height2"
+      },
+      "03-05": {
+        "terrain": "ground"
+      },
+      "03-06": {
+        "terrain": "ground"
+      },
+      "03-07": {
+        "terrain": "ground"
+      },
+      "03-08": {
+        "terrain": "ground"
+      },
+      "03-09": {
+        "terrain": "ground"
+      },
+      "03-10": {
+        "terrain": "ground"
+      },
+      "03-11": {
+        "terrain": "ground"
+      },
+      "03-12": {
+        "terrain": "height1",
+        "token": "upgrade"
+      },
+      "03-13": {
+        "terrain": "height1",
+        "token": "red_garrison"
+      },
+      "03-14": {
+        "terrain": "ground"
+      },
+      "03-15": {
+        "terrain": "ground"
+      },
+      "04-01": {
+        "terrain": "height1"
+      },
+      "04-02": {
+        "terrain": "height1"
+      },
+      "04-03": {
+        "terrain": "height1"
+      },
+      "04-04": {
+        "terrain": "height2"
+      },
+      "04-05": {
+        "terrain": "ground"
+      },
+      "04-06": {
+        "terrain": "ground"
+      },
+      "04-07": {
+        "terrain": "ground"
+      },
+      "04-08": {
+        "terrain": "height1",
+        "special_terrain": "impassable_terrain"
+      },
+      "04-09": {
+        "terrain": "ground"
+      },
+      "04-10": {
+        "terrain": "ground"
+      },
+      "04-11": {
+        "terrain": "ground"
+      },
+      "04-12": {
+        "terrain": "height1",
+        "token": "blue_garrison"
+      },
+      "04-13": {
+        "terrain": "height1"
+      },
+      "04-14": {
+        "terrain": "ground"
+      },
+      "04-15": {
+        "terrain": "ground"
+      },
+      "05-01": {
+        "terrain": "ground",
+        "token": "blue_garrison"
+      },
+      "05-02": {
+        "terrain": "ground"
+      },
+      "05-03": {
+        "terrain": "height1"
+      },
+      "05-04": {
+        "terrain": "height1"
+      },
+      "05-05": {
+        "terrain": "ground",
+        "token": "upgrade"
+      },
+      "05-06": {
+        "terrain": "height1",
+        "special_terrain": "impassable_terrain"
+      },
+      "05-07": {
+        "terrain": "ground"
+      },
+      "05-08": {
+        "terrain": "ground"
+      },
+      "05-09": {
+        "terrain": "ground",
+        "token": "blue_garrison"
+      },
+      "05-10": {
+        "terrain": "ground"
+      },
+      "05-11": {
+        "terrain": "ground"
+      },
+      "05-12": {
+        "terrain": "ground"
+      },
+      "05-13": {
+        "terrain": "ground"
+      },
+      "05-14": {
+        "terrain": "ground"
+      },
+      "05-15": {
+        "terrain": "ground"
+      },
+      "06-01": {
+        "terrain": "ground"
+      },
+      "06-02": {
+        "terrain": "ground"
+      },
+      "06-03": {
+        "terrain": "ground"
+      },
+      "06-04": {
+        "terrain": "ground",
+        "token": "red_garrison"
+      },
+      "06-05": {
+        "terrain": "ground"
+      },
+      "06-06": {
+        "terrain": "ground"
+      },
+      "06-07": {
+        "terrain": "height1",
+        "special_terrain": "impassable_terrain"
+      },
+      "06-08": {
+        "terrain": "ground"
+      },
+      "06-09": {
+        "terrain": "ground"
+      },
+      "06-10": {
+        "terrain": "height1",
+        "token": "upgrade"
+      },
+      "06-11": {
+        "terrain": "ground"
+      },
+      "06-12": {
+        "terrain": "height2"
+      },
+      "06-13": {
+        "terrain": "ground"
+      },
+      "06-14": {
+        "terrain": "ground"
+      },
+      "06-15": {
+        "terrain": "ground"
+      },
+      "07-01": {
+        "terrain": "ground"
+      },
+      "07-02": {
+        "terrain": "height1",
+        "token": "energy"
+      },
+      "07-03": {
+        "terrain": "height1"
+      },
+      "07-04": {
+        "terrain": "ground",
+        "token": "upgrade"
+      },
+      "07-05": {
+        "terrain": "ground"
+      },
+      "07-06": {
+        "terrain": "height1",
+        "special_terrain": "impassable_terrain"
+      },
+      "07-07": {
+        "terrain": "ground"
+      },
+      "07-08": {
+        "terrain": "ground",
+        "token": "objective",
+        "objective_number": 1
+      },
+      "07-09": {
+        "terrain": "height2",
+        "special_terrain": "impassable_terrain"
+      },
+      "07-10": {
+        "terrain": "ground"
+      },
+      "07-11": {
+        "terrain": "ground"
+      },
+      "07-12": {
+        "terrain": "height2",
+        "token": "objective",
+        "objective_number": 4
+      },
+      "07-13": {
+        "terrain": "height1",
+        "token": "red_garrison"
+      },
+      "07-14": {
+        "terrain": "height1",
+        "token": "energy"
+      },
+      "07-15": {
+        "terrain": "ground"
+      },
+      "08-01": {
+        "terrain": "ground"
+      },
+      "08-02": {
+        "terrain": "ground"
+      },
+      "08-03": {
+        "terrain": "height1"
+      },
+      "08-04": {
+        "terrain": "ground",
+        "token": "blue_garrison"
+      },
+      "08-05": {
+        "terrain": "ground"
+      },
+      "08-06": {
+        "terrain": "ground"
+      },
+      "08-07": {
+        "terrain": "ground"
+      },
+      "08-08": {
+        "terrain": "ground"
+      },
+      "08-09": {
+        "terrain": "height2",
+        "special_terrain": "impassable_terrain"
+      },
+      "08-10": {
+        "terrain": "height1",
+        "token": "upgrade"
+      },
+      "08-11": {
+        "terrain": "ground"
+      },
+      "08-12": {
+        "terrain": "height2"
+      },
+      "08-13": {
+        "terrain": "height1",
+        "token": "blue_garrison"
+      },
+      "08-14": {
+        "terrain": "ground"
+      },
+      "08-15": {
+        "terrain": "ground"
+      },
+      "09-01": {
+        "terrain": "ground"
+      },
+      "09-02": {
+        "terrain": "ground"
+      },
+      "09-03": {
+        "terrain": "ground"
+      },
+      "09-04": {
+        "terrain": "height1"
+      },
+      "09-05": {
+        "terrain": "ground"
+      },
+      "09-06": {
+        "terrain": "height1",
+        "special_terrain": "impassable_terrain"
+      },
+      "09-07": {
+        "terrain": "height1",
+        "special_terrain": "impassable_terrain"
+      },
+      "09-08": {
+        "terrain": "ground"
+      },
+      "09-09": {
+        "terrain": "ground"
+      },
+      "09-10": {
+        "terrain": "ground"
+      },
+      "09-11": {
+        "terrain": "ground"
+      },
+      "09-12": {
+        "terrain": "ground"
+      },
+      "09-13": {
+        "terrain": "ground"
+      },
+      "09-14": {
+        "terrain": "ground"
+      },
+      "09-15": {
+        "terrain": "ground"
+      },
+      "10-01": {
+        "terrain": "ground",
+        "token": "red_garrison"
+      },
+      "10-02": {
+        "terrain": "height1"
+      },
+      "10-03": {
+        "terrain": "height1"
+      },
+      "10-04": {
+        "terrain": "height2"
+      },
+      "10-05": {
+        "terrain": "ground",
+        "token": "upgrade"
+      },
+      "10-06": {
+        "terrain": "ground"
+      },
+      "10-07": {
+        "terrain": "ground"
+      },
+      "10-08": {
+        "terrain": "height1",
+        "special_terrain": "impassable_terrain"
+      },
+      "10-09": {
+        "terrain": "ground",
+        "token": "red_garrison"
+      },
+      "10-10": {
+        "terrain": "ground"
+      },
+      "10-11": {
+        "terrain": "ground"
+      },
+      "10-12": {
+        "terrain": "ground"
+      },
+      "10-13": {
+        "terrain": "ground"
+      },
+      "10-14": {
+        "terrain": "ground"
+      },
+      "10-15": {
+        "terrain": "ground"
+      },
+      "11-01": {
+        "terrain": "height1"
+      },
+      "11-02": {
+        "terrain": "height1",
+        "token": "objective",
+        "objective_number": 3
+      },
+      "11-03": {
+        "terrain": "height1"
+      },
+      "11-04": {
+        "terrain": "height2"
+      },
+      "11-05": {
+        "terrain": "ground"
+      },
+      "11-06": {
+        "terrain": "ground"
+      },
+      "11-07": {
+        "terrain": "ground"
+      },
+      "11-08": {
+        "terrain": "ground"
+      },
+      "11-09": {
+        "terrain": "ground"
+      },
+      "11-10": {
+        "terrain": "ground"
+      },
+      "11-11": {
+        "terrain": "ground"
+      },
+      "11-12": {
+        "terrain": "height1",
+        "token": "red_garrison"
+      },
+      "11-13": {
+        "terrain": "ground"
+      },
+      "11-14": {
+        "terrain": "ground"
+      },
+      "11-15": {
+        "terrain": "ground"
+      },
+      "12-01": {
+        "terrain": "height1",
+        "token": "upgrade"
+      },
+      "12-02": {
+        "terrain": "height1"
+      },
+      "12-03": {
+        "terrain": "height1",
+        "token": "blue_garrison"
+      },
+      "12-04": {
+        "terrain": "height1"
+      },
+      "12-05": {
+        "terrain": "ground"
+      },
+      "12-06": {
+        "terrain": "ground"
+      },
+      "12-07": {
+        "terrain": "ground"
+      },
+      "12-08": {
+        "terrain": "ground"
+      },
+      "12-09": {
+        "terrain": "ground"
+      },
+      "12-10": {
+        "terrain": "ground"
+      },
+      "12-11": {
+        "terrain": "ground"
+      },
+      "12-12": {
+        "terrain": "height1",
+        "token": "upgrade"
+      },
+      "12-13": {
+        "terrain": "height1"
+      },
+      "12-14": {
+        "terrain": "ground"
+      },
+      "12-15": {
+        "terrain": "ground"
+      },
+      "13-01": {
+        "terrain": "height1"
+      },
+      "13-02": {
+        "terrain": "ground"
+      },
+      "13-03": {
+        "terrain": "ground"
+      },
+      "13-04": {
+        "terrain": "ground"
+      },
+      "13-05": {
+        "terrain": "ground"
+      },
+      "13-06": {
+        "terrain": "ground"
+      },
+      "13-07": {
+        "terrain": "ground"
+      },
+      "13-08": {
+        "terrain": "ground",
+        "token": "blue_base"
+      },
+      "13-09": {
+        "terrain": "ground"
+      },
+      "13-10": {
+        "terrain": "ground"
+      },
+      "13-11": {
+        "terrain": "ground"
+      },
+      "13-12": {
+        "terrain": "ground"
+      },
+      "13-13": {
+        "terrain": "height1",
+        "token": "blue_garrison"
+      },
+      "13-14": {
+        "terrain": "ground"
+      },
+      "13-15": {
+        "terrain": "ground"
+      },
+      "14-01": {
+        "terrain": "ground"
+      },
+      "14-03": {
+        "terrain": "ground"
+      },
+      "14-05": {
+        "terrain": "ground"
+      },
+      "14-07": {
+        "terrain": "ground"
+      },
+      "14-09": {
+        "terrain": "ground"
+      },
+      "14-11": {
+        "terrain": "ground"
+      },
+      "14-13": {
+        "terrain": "ground"
+      },
+      "14-15": {
+        "terrain": "ground"
+      }
+    }
   }
 ]
