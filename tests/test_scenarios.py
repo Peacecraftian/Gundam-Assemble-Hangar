@@ -81,6 +81,86 @@ class ScenarioFileTests(unittest.TestCase):
         self.assertEqual(cells[keys[2]], {"terrain": "height1", "token": "energy"})
         self.assertEqual([cells[key]["objective_number"] for key in (keys[0], keys[3], keys[4])], [1, 2, 3])
 
+    def test_special_objectives_round_trip_without_using_regular_objective_slots(self):
+        cells = self.scenario["cells"]
+        self.assertTrue(set_scenario_token(cells, "01-01", "special_objective"))
+        self.assertEqual(cells["01-01"]["objective_number"], 1)
+        write_scenario_file(self.path, self.scenario)
+        self.assertEqual(read_scenario_file(self.path)["cells"], cells)
+        self.assertTrue(set_scenario_token(cells, "02-04", "special_objective"))
+        self.assertEqual(cells["02-04"]["objective_number"], 2)
+        self.assertEqual([cells[key]["objective_number"] for key in ("02-07", "02-06", "02-05")], [1, 2, 3])
+        write_scenario_file(self.path, self.scenario)
+        self.assertEqual(read_scenario_file(self.path)["cells"], cells)
+
+    def test_special_numbering_closes_gaps_on_removal_and_replacement_then_restarts(self):
+        cells = self.scenario["cells"]
+        keys = ("03-09", "01-01", "06-04", "04-07", "08-03")
+        regular = {key: deepcopy(cell) for key, cell in cells.items() if cell.get("token") == "objective"}
+        for key in keys:
+            self.assertTrue(set_scenario_token(cells, key, "special_objective"))
+        self.assertEqual([cells[key]["objective_number"] for key in keys], [1, 2, 3, 4, 5])
+        self.assertFalse(set_scenario_token(cells, keys[0], "special_objective"))
+        set_scenario_token(cells, keys[1], None)
+        set_scenario_token(cells, keys[2], "energy")
+        self.assertEqual([cells[key]["objective_number"] for key in (keys[0], keys[3], keys[4])], [1, 2, 3])
+        self.assertNotIn("objective_number", cells[keys[1]])
+        self.assertNotIn("objective_number", cells[keys[2]])
+        set_scenario_token(cells, keys[1], "special_objective")
+        self.assertEqual(cells[keys[1]]["objective_number"], 4)
+        self.assertEqual({key: cells[key] for key in regular}, regular)
+        for key in (keys[0], keys[1], keys[3], keys[4]):
+            set_scenario_token(cells, key, None)
+        set_scenario_token(cells, keys[2], "special_objective")
+        self.assertEqual(cells[keys[2]]["objective_number"], 1)
+
+    def test_switching_objective_types_updates_both_sequences_and_failed_placement_is_atomic(self):
+        cells = self.scenario["cells"]
+        set_scenario_token(cells, "01-01", "special_objective")
+        set_scenario_token(cells, "01-02", "special_objective")
+        before = deepcopy(cells)
+        with self.assertRaisesRegex(ValueError, "Up to 4 objectives"):
+            set_scenario_token(cells, "01-01", "objective")
+        self.assertEqual(cells, before)
+        set_scenario_token(cells, "02-04", "special_objective")
+        self.assertEqual(cells["02-04"]["objective_number"], 3)
+        self.assertEqual([cells[key]["objective_number"] for key in ("02-07", "02-06", "02-05")], [1, 2, 3])
+        set_scenario_token(cells, "01-01", "objective")
+        self.assertEqual(cells["01-01"]["objective_number"], 4)
+        self.assertEqual([cells[key]["objective_number"] for key in ("01-02", "02-04")], [1, 2])
+        write_scenario_file(self.path, self.scenario)
+        self.assertEqual(read_scenario_file(self.path)["cells"], cells)
+
+    def test_legacy_special_objectives_get_numbers_without_rewriting_saved_payloads(self):
+        cells = self.scenario["cells"]
+        for key in ("05-09", "01-02", "03-05"):
+            cells[key]["token"] = "special_objective"
+        self.path.write_text(json.dumps(self.scenario), encoding="utf-8")
+        original = self.path.read_bytes()
+        imported = read_scenario_file(self.path)
+        self.assertEqual([imported["cells"][key]["objective_number"] for key in ("01-02", "03-05", "05-09")], [1, 2, 3])
+        self.assertEqual(self.path.read_bytes(), original)
+        store = MatchStore(self.path.with_suffix(".sqlite3"))
+        self.addCleanup(store.close)
+        store.save_scenario(self.scenario, 0)
+        choices, _ = scenario_choices(store)
+        self.assertEqual(choices[-1][0]["cells"], imported["cells"])
+        self.assertEqual(store.load_scenarios(), [(self.scenario, 1)])
+
+    def test_rejects_invalid_or_partial_special_objective_numbers(self):
+        for number in (0, -1, True, "1", 1.5, 2, 3, None):
+            with self.subTest(number=number):
+                scenario = deepcopy(self.scenario)
+                scenario["cells"]["01-01"].update(token="special_objective", objective_number=1)
+                scenario["cells"]["01-02"].update(token="special_objective", objective_number=2)
+                if number is None:
+                    del scenario["cells"]["01-01"]["objective_number"]
+                else:
+                    scenario["cells"]["01-01"]["objective_number"] = number
+                self.path.write_text(json.dumps(scenario), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    read_scenario_file(self.path)
+
     def test_legacy_maps_keep_all_unnumbered_objectives_in_board_order(self):
         cells = self.scenario["cells"]
         for cell in cells.values():

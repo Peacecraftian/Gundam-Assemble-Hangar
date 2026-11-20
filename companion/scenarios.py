@@ -1,6 +1,5 @@
 import json
 
-from .card_display import atomic_write
 from .catalog import ASSETS, unique_keys
 from .storage import LOCAL_SCENARIO_PREFIX
 
@@ -27,6 +26,16 @@ SPECIAL_TERRAIN = {
     "debris_fields": ("Debris Fields", "debris-fields"),
     "minovsky_particles": ("Minovsky Particles", "minovsky-particles"),
 }
+SPECIAL_TERRAIN_RULES = {
+    "water": "Move actions starting in water lose 1 hex.\n"
+             "Attacks lose 1 Accuracy for the attacker in water and 1 for the target in water (-2 if both).",
+    "impassable_terrain": "Only units with Hover can move through these hexes. "
+                          "Every unit must end its movement elsewhere.",
+    "debris_fields": "Move actions starting in a debris field lose 1 hex.\n"
+                     "Attacks lose 1 Accuracy for the attacker in debris and 1 for the target in debris (-2 if both).",
+    "minovsky_particles": "For non-adjacent attacks, apply -2 Accuracy if either the attacker or target is inside "
+                          "Minovsky Particles. Apply the penalty once when both are inside.",
+}
 TOKENS = {
     "red_base": ("Red base", "red-deployment-base"),
     "blue_base": ("Blue base", "blue-deployment-base"),
@@ -34,8 +43,10 @@ TOKENS = {
     "blue_garrison": ("Blue garrison", "blue-garrison"),
     "energy": ("Energy", "energy"),
     "objective": ("Objective", "objective"),
+    "special_objective": ("Special Objective", "special-objective"),
     "upgrade": ("Upgrade", "generic-upgrade"),
 }
+NUMBERED_TOKENS = ("objective", "special_objective")
 MISSION_FIELDS = (
     ("Mission Name", "name"), ("Location", "location"),
     ("Overview", "overview"), ("Objectives", "objectives"),
@@ -73,7 +84,7 @@ def validate_scenario(scenario):
     cells = scenario.get("cells")
     if not isinstance(cells, dict) or cells.keys() != set(HEX_KEYS):
         raise ValueError("Scenarios require 15 columns alternating between 14 and 13 hexes.")
-    objective_numbers = []
+    objective_numbers = {token: [] for token in NUMBERED_TOKENS}
     for key, cell in cells.items():
         if not isinstance(cell, dict):
             raise ValueError(f"Invalid hex {key}.")
@@ -87,13 +98,14 @@ def validate_scenario(scenario):
             raise ValueError(f"Unknown token at hex {key}.")
         if "objective_number" in cell:
             number = cell["objective_number"]
-            if token != "objective" or type(number) is not int or number < 1:
+            if token not in NUMBERED_TOKENS or type(number) is not int or number < 1:
                 raise ValueError(f"Invalid objective number at hex {key}.")
-            objective_numbers.append(number)
-    if objective_numbers:
-        count = sum(cell.get("token") == "objective" for cell in cells.values())
-        if sorted(objective_numbers) != list(range(1, count + 1)):
-            raise ValueError("Objective numbers must be consecutive starting at 1.")
+            objective_numbers[token].append(number)
+    for token, numbers in objective_numbers.items():
+        if numbers:
+            count = sum(cell.get("token") == token for cell in cells.values())
+            if sorted(numbers) != list(range(1, count + 1)):
+                raise ValueError(f"{TOKENS[token][0]} numbers must be consecutive starting at 1.")
 
 
 def set_scenario_token(cells, key, token):
@@ -101,16 +113,17 @@ def set_scenario_token(cells, key, token):
     previous = cell.get("token")
     if previous == token:
         return False
-    if token == "objective":
-        count = sum(other.get("token") == "objective" for other in cells.values())
-        if count >= MAX_OBJECTIVES:
+    if token in NUMBERED_TOKENS:
+        count = sum(other.get("token") == token for other in cells.values())
+        if token == "objective" and count >= MAX_OBJECTIVES:
             raise ValueError(f"Up to {MAX_OBJECTIVES} objectives fit on a map. Remove one to place another.")
-        cell["objective_number"] = count + 1
-    elif previous == "objective":
+    if previous in NUMBERED_TOKENS:
         removed = cell.pop("objective_number")
         for other in cells.values():
-            if other.get("objective_number", 0) > removed:
+            if other.get("token") == previous and other.get("objective_number", 0) > removed:
                 other["objective_number"] -= 1
+    if token in NUMBERED_TOKENS:
+        cell["objective_number"] = count + 1
     if token is None:
         del cell["token"]
     else:
@@ -151,11 +164,12 @@ def normalize_scenario(scenario):
                     migrated.setdefault("special_terrain", "water")
                 scenario["cells"][key] = migrated
                 has_forest = has_forest or terrain == "forest"
-        objectives = [key for key in HEX_KEYS
-                      if isinstance(cells.get(key), dict) and cells[key].get("token") == "objective"]
-        if all("objective_number" not in cells[key] for key in objectives):
-            for number, key in enumerate(objectives, 1):
-                scenario["cells"][key] = dict(scenario["cells"][key], objective_number=number)
+        for token in NUMBERED_TOKENS:
+            objectives = [key for key in HEX_KEYS
+                          if isinstance(cells.get(key), dict) and cells[key].get("token") == token]
+            if all("objective_number" not in cells[key] for key in objectives):
+                for number, key in enumerate(objectives, 1):
+                    scenario["cells"][key] = dict(scenario["cells"][key], objective_number=number)
     scenario.setdefault("palette", "jungle" if has_forest else DEFAULT_PALETTE)
     return scenario
 
@@ -174,6 +188,8 @@ def rotate_portrait_board(scenario):
 
 
 def write_scenario_file(path, scenario):
+    from .card_display import atomic_write
+
     validate_scenario(scenario)
     contents = json.dumps(normalize_scenario(scenario), ensure_ascii=False, indent=2) + "\n"
     atomic_write(path, contents.encode("utf-8"))

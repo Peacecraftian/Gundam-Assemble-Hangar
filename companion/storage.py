@@ -118,12 +118,20 @@ class MatchStore:
             elif current:
                 if current[1] == payload:
                     return expected_revision
-                self.db.execute("INSERT INTO undo (payload) VALUES (?)", (current[1],))
+                previous_attack = json.loads(current[1]).get("pending_attack")
+                continuing = previous_attack and getattr(match, "_attack_continuation", False)
+                if previous_attack and not continuing:
+                    # An independent edit ends the interrupted attack. Undo restores it.
+                    match.pending_attack = None
+                    payload = match.to_json()
+                if not continuing:
+                    self.db.execute("INSERT INTO undo (payload) VALUES (?)", (current[1],))
                 self.db.execute("""
                     DELETE FROM undo WHERE id NOT IN (SELECT id FROM undo ORDER BY id DESC LIMIT ?)
                 """, (UNDO_LIMIT,))
             revision = expected_revision + 1
             self._write(revision, payload)
+        match._attack_continuation = False
         return revision
 
     def undo(self, expected_revision):

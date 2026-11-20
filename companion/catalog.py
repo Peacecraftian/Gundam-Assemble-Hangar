@@ -56,6 +56,13 @@ def published_number(filename):
     return match[1].upper() if match else None
 
 
+def sortie_filename(printed):
+    """Published companion artwork for a playable Unit's English rules front."""
+    if isinstance(printed, str) and re.fullmatch(r'img_card_front_[a-z0-9]+-u[0-9]+_en\.webp', printed):
+        return printed.replace('img_card_front_', 'img_card_', 1)
+    return None
+
+
 def card_image_paths(filename, directory=ASSETS, folder=UNIT_CARDS):
     if any(separator in filename for separator in ("/", "\\", ":")):
         return ()

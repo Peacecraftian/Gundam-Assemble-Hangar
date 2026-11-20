@@ -1,0 +1,696 @@
+{
+  "id": "official-gravedigger",
+  "name": "Operation Gravedigger",
+  "location": "Space - Salvage Zone",
+  "overview": "Shattered debris mingles with small asteroids and the remains of derelict ships, coalescing into a floating graveyard brimming with the memories of the fallen. Dormant fusion reactors lie sleeping among the mangled ruins, harvestable energy poised to lure the unwary into a maze of twisted steel and shredded armor plating. The wreckage lies in silence, until engines ignite and battle begins anew.\n\nIntelligence confirms the presence of dormant ship reactors among a nearby salvage zone. Energy harvested from these reactors would both restore depleted resources and ensure a reserve sufficient to continue operations in this sector. Enemy ships have been sighted on approach and we expect enemy mobile suits will be deployed shortly. Secure the reactors for immediate resource extraction.",
+  "objectives": "Secure the destroyed ships (Objectives) scattered throughout the salvage zone. Each ship you control at the end of a Phase is worth victory points as described here:\n• The ship in the center of the Minovsky Particles (1) is worth 5 victory points.\n• The ships at the edges of the salvage zone (2, 3) are each worth 8 victory points.\n\nFusion Charges:\nThis scenario features two Interaction Points representing abandoned munition caches containing Fusion Charges. Any unit may end their movement on one of these caches to collect two Fusion Charge tokens that can later be placed in hexes on the battlefield.\n\nWhen a unit ends its movement on an Interaction Point, remove the Interaction Point from the board and then collect two Fusion Charge tokens and place them on the corresponding unit card. Once a unit has collected Fusion Charges, that unit gains the following additional ability:\n\nCOMMAND: Place up to 2 Fusion Charges on empty hexes within [Range 3]. Once placed, these Charges will detonate when an enemy unit ends any movement on or adjacent to them. Once detonated, Fusion Charges are removed from the game.\n\nAfter an enemy unit ends a movement on or adjacent to an allied Fusion Charge: Detonate that Fusion Charge—The unit that placed it deals [Damage 1] to each enemy on or adjacent to it and applies [Fracture] to those enemies. Then, remove the Fusion Charge token from the game.",
+  "palette": "space",
+  "cells": {
+    "01-01": {
+      "terrain": "ground"
+    },
+    "01-02": {
+      "terrain": "ground"
+    },
+    "01-03": {
+      "terrain": "ground"
+    },
+    "01-04": {
+      "terrain": "ground",
+      "token": "blue_garrison"
+    },
+    "01-05": {
+      "terrain": "ground"
+    },
+    "01-06": {
+      "terrain": "ground"
+    },
+    "01-07": {
+      "terrain": "ground"
+    },
+    "01-08": {
+      "terrain": "height1",
+      "token": "red_base"
+    },
+    "01-09": {
+      "terrain": "ground"
+    },
+    "01-10": {
+      "terrain": "ground"
+    },
+    "01-11": {
+      "terrain": "ground"
+    },
+    "01-12": {
+      "terrain": "height1",
+      "token": "upgrade"
+    },
+    "01-13": {
+      "terrain": "ground",
+      "token": "red_garrison"
+    },
+    "01-14": {
+      "terrain": "ground"
+    },
+    "01-15": {
+      "terrain": "ground"
+    },
+    "02-01": {
+      "terrain": "ground"
+    },
+    "02-02": {
+      "terrain": "ground"
+    },
+    "02-03": {
+      "terrain": "ground"
+    },
+    "02-04": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "02-05": {
+      "terrain": "ground"
+    },
+    "02-06": {
+      "terrain": "ground"
+    },
+    "02-07": {
+      "terrain": "ground"
+    },
+    "02-08": {
+      "terrain": "ground"
+    },
+    "02-09": {
+      "terrain": "ground"
+    },
+    "02-10": {
+      "terrain": "ground"
+    },
+    "02-11": {
+      "terrain": "ground"
+    },
+    "02-12": {
+      "terrain": "ground"
+    },
+    "02-13": {
+      "terrain": "ground"
+    },
+    "02-14": {
+      "terrain": "ground"
+    },
+    "02-15": {
+      "terrain": "ground"
+    },
+    "03-01": {
+      "terrain": "ground"
+    },
+    "03-02": {
+      "terrain": "ground"
+    },
+    "03-03": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "03-04": {
+      "terrain": "height1",
+      "token": "special_objective",
+      "objective_number": 1
+    },
+    "03-05": {
+      "terrain": "height1",
+      "token": "red_garrison"
+    },
+    "03-06": {
+      "terrain": "ground"
+    },
+    "03-07": {
+      "terrain": "ground"
+    },
+    "03-08": {
+      "terrain": "ground"
+    },
+    "03-09": {
+      "terrain": "ground"
+    },
+    "03-10": {
+      "terrain": "ground"
+    },
+    "03-11": {
+      "terrain": "ground"
+    },
+    "03-12": {
+      "terrain": "ground"
+    },
+    "03-13": {
+      "terrain": "ground"
+    },
+    "03-14": {
+      "terrain": "ground"
+    },
+    "03-15": {
+      "terrain": "ground"
+    },
+    "04-01": {
+      "terrain": "ground"
+    },
+    "04-02": {
+      "terrain": "ground"
+    },
+    "04-03": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "04-04": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "04-05": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "04-06": {
+      "terrain": "height1",
+      "special_terrain": "impassable_terrain"
+    },
+    "04-07": {
+      "terrain": "ground"
+    },
+    "04-08": {
+      "terrain": "height1",
+      "special_terrain": "impassable_terrain"
+    },
+    "04-09": {
+      "terrain": "height1",
+      "special_terrain": "impassable_terrain"
+    },
+    "04-10": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "04-11": {
+      "terrain": "ground"
+    },
+    "04-12": {
+      "terrain": "height1"
+    },
+    "04-13": {
+      "terrain": "height1",
+      "token": "blue_garrison"
+    },
+    "04-14": {
+      "terrain": "ground"
+    },
+    "04-15": {
+      "terrain": "ground"
+    },
+    "05-01": {
+      "terrain": "height1",
+      "token": "upgrade"
+    },
+    "05-02": {
+      "terrain": "height1"
+    },
+    "05-03": {
+      "terrain": "ground"
+    },
+    "05-04": {
+      "terrain": "ground"
+    },
+    "05-05": {
+      "terrain": "ground"
+    },
+    "05-06": {
+      "terrain": "ground"
+    },
+    "05-07": {
+      "terrain": "ground"
+    },
+    "05-08": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "05-09": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles",
+      "token": "upgrade"
+    },
+    "05-10": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "05-11": {
+      "terrain": "ground"
+    },
+    "05-12": {
+      "terrain": "ground"
+    },
+    "05-13": {
+      "terrain": "ground"
+    },
+    "05-14": {
+      "terrain": "ground"
+    },
+    "05-15": {
+      "terrain": "ground"
+    },
+    "06-01": {
+      "terrain": "height2"
+    },
+    "06-02": {
+      "terrain": "height2"
+    },
+    "06-03": {
+      "terrain": "height1"
+    },
+    "06-04": {
+      "terrain": "ground",
+      "token": "blue_garrison"
+    },
+    "06-05": {
+      "terrain": "ground"
+    },
+    "06-06": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles",
+      "token": "red_garrison"
+    },
+    "06-07": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "06-08": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "06-09": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "06-10": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "06-11": {
+      "terrain": "ground"
+    },
+    "06-12": {
+      "terrain": "ground"
+    },
+    "06-13": {
+      "terrain": "ground"
+    },
+    "06-14": {
+      "terrain": "ground",
+      "token": "blue_garrison"
+    },
+    "06-15": {
+      "terrain": "ground",
+      "token": "upgrade"
+    },
+    "07-01": {
+      "terrain": "height2",
+      "token": "objective",
+      "objective_number": 2
+    },
+    "07-02": {
+      "terrain": "height2"
+    },
+    "07-03": {
+      "terrain": "height1",
+      "token": "energy"
+    },
+    "07-04": {
+      "terrain": "ground"
+    },
+    "07-05": {
+      "terrain": "ground"
+    },
+    "07-06": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "07-07": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "07-08": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles",
+      "token": "objective",
+      "objective_number": 1
+    },
+    "07-09": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "07-10": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "07-11": {
+      "terrain": "ground"
+    },
+    "07-12": {
+      "terrain": "ground"
+    },
+    "07-13": {
+      "terrain": "height1"
+    },
+    "07-14": {
+      "terrain": "height2"
+    },
+    "07-15": {
+      "terrain": "height2"
+    },
+    "08-01": {
+      "terrain": "height2"
+    },
+    "08-02": {
+      "terrain": "ground",
+      "token": "red_garrison"
+    },
+    "08-03": {
+      "terrain": "height1"
+    },
+    "08-04": {
+      "terrain": "ground"
+    },
+    "08-05": {
+      "terrain": "ground"
+    },
+    "08-06": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "08-07": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "08-08": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "08-09": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "08-10": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles",
+      "token": "blue_garrison"
+    },
+    "08-11": {
+      "terrain": "ground"
+    },
+    "08-12": {
+      "terrain": "ground",
+      "token": "red_garrison"
+    },
+    "08-13": {
+      "terrain": "height1",
+      "token": "energy"
+    },
+    "08-14": {
+      "terrain": "height2"
+    },
+    "08-15": {
+      "terrain": "height2",
+      "token": "objective",
+      "objective_number": 3
+    },
+    "09-01": {
+      "terrain": "ground",
+      "token": "upgrade"
+    },
+    "09-02": {
+      "terrain": "ground"
+    },
+    "09-03": {
+      "terrain": "ground"
+    },
+    "09-04": {
+      "terrain": "ground"
+    },
+    "09-05": {
+      "terrain": "ground"
+    },
+    "09-06": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "09-07": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "09-08": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "09-09": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "09-10": {
+      "terrain": "ground"
+    },
+    "09-11": {
+      "terrain": "ground"
+    },
+    "09-12": {
+      "terrain": "ground"
+    },
+    "09-13": {
+      "terrain": "height1"
+    },
+    "09-14": {
+      "terrain": "height1"
+    },
+    "09-15": {
+      "terrain": "height2"
+    },
+    "10-01": {
+      "terrain": "ground"
+    },
+    "10-02": {
+      "terrain": "ground"
+    },
+    "10-03": {
+      "terrain": "ground"
+    },
+    "10-04": {
+      "terrain": "height1"
+    },
+    "10-05": {
+      "terrain": "ground"
+    },
+    "10-06": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "10-07": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles",
+      "token": "upgrade"
+    },
+    "10-08": {
+      "terrain": "height1",
+      "special_terrain": "impassable_terrain"
+    },
+    "10-09": {
+      "terrain": "ground"
+    },
+    "10-10": {
+      "terrain": "height1",
+      "special_terrain": "impassable_terrain"
+    },
+    "10-11": {
+      "terrain": "ground"
+    },
+    "10-12": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "10-13": {
+      "terrain": "ground"
+    },
+    "10-14": {
+      "terrain": "ground"
+    },
+    "10-15": {
+      "terrain": "height1",
+      "token": "upgrade"
+    },
+    "11-01": {
+      "terrain": "ground"
+    },
+    "11-02": {
+      "terrain": "ground"
+    },
+    "11-03": {
+      "terrain": "height1",
+      "token": "red_garrison"
+    },
+    "11-04": {
+      "terrain": "ground"
+    },
+    "11-05": {
+      "terrain": "ground"
+    },
+    "11-06": {
+      "terrain": "ground"
+    },
+    "11-07": {
+      "terrain": "height1",
+      "special_terrain": "impassable_terrain"
+    },
+    "11-08": {
+      "terrain": "ground"
+    },
+    "11-09": {
+      "terrain": "ground"
+    },
+    "11-10": {
+      "terrain": "ground"
+    },
+    "11-11": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "11-12": {
+      "terrain": "height1",
+      "token": "special_objective",
+      "objective_number": 2
+    },
+    "11-13": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "11-14": {
+      "terrain": "ground"
+    },
+    "11-15": {
+      "terrain": "ground"
+    },
+    "12-01": {
+      "terrain": "ground"
+    },
+    "12-02": {
+      "terrain": "ground"
+    },
+    "12-03": {
+      "terrain": "ground"
+    },
+    "12-04": {
+      "terrain": "ground"
+    },
+    "12-05": {
+      "terrain": "ground"
+    },
+    "12-06": {
+      "terrain": "ground"
+    },
+    "12-07": {
+      "terrain": "ground"
+    },
+    "12-08": {
+      "terrain": "ground"
+    },
+    "12-09": {
+      "terrain": "ground"
+    },
+    "12-10": {
+      "terrain": "ground"
+    },
+    "12-11": {
+      "terrain": "height1",
+      "token": "blue_garrison"
+    },
+    "12-12": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "12-13": {
+      "terrain": "ground",
+      "special_terrain": "minovsky_particles"
+    },
+    "12-14": {
+      "terrain": "ground"
+    },
+    "12-15": {
+      "terrain": "ground"
+    },
+    "13-01": {
+      "terrain": "ground"
+    },
+    "13-02": {
+      "terrain": "ground"
+    },
+    "13-03": {
+      "terrain": "ground"
+    },
+    "13-04": {
+      "terrain": "height1",
+      "token": "upgrade"
+    },
+    "13-05": {
+      "terrain": "ground"
+    },
+    "13-06": {
+      "terrain": "ground"
+    },
+    "13-07": {
+      "terrain": "ground"
+    },
+    "13-08": {
+      "terrain": "height1",
+      "token": "blue_base"
+    },
+    "13-09": {
+      "terrain": "ground"
+    },
+    "13-10": {
+      "terrain": "ground"
+    },
+    "13-11": {
+      "terrain": "ground"
+    },
+    "13-12": {
+      "terrain": "ground",
+      "token": "red_garrison"
+    },
+    "13-13": {
+      "terrain": "ground"
+    },
+    "13-14": {
+      "terrain": "ground"
+    },
+    "13-15": {
+      "terrain": "ground"
+    },
+    "14-01": {
+      "terrain": "ground"
+    },
+    "14-03": {
+      "terrain": "ground",
+      "token": "blue_garrison"
+    },
+    "14-05": {
+      "terrain": "ground"
+    },
+    "14-07": {
+      "terrain": "ground"
+    },
+    "14-09": {
+      "terrain": "ground"
+    },
+    "14-11": {
+      "terrain": "ground"
+    },
+    "14-13": {
+      "terrain": "ground"
+    },
+    "14-15": {
+      "terrain": "ground"
+    }
+  }
+}

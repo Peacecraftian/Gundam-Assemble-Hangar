@@ -46,10 +46,20 @@ def load_attacks(catalog, directory=ASSETS):
     return attacks
 
 
-def die_result(face, accuracy):
+def critical_threshold(card_number):
+    return 7 if card_number == "ST01-U02" else 9
+
+
+def rifle_bonus(card_number, weapon_name, values, disarmed):
+    if card_number == "ST01-U02" and weapon_name == "Twin Buster Rifle" and not disarmed:
+        return min(4, sum(face >= critical_threshold(card_number) for face in values))
+    return 0
+
+
+def die_result(face, accuracy, card_number=None):
     if not 1 <= face <= 10:
         raise ValueError("Attack dice have faces 1 through 10.")
-    if face >= 9:
+    if face >= critical_threshold(card_number):
         return "critical"
     if face != 1 and face + accuracy >= 4:
         return "hit"

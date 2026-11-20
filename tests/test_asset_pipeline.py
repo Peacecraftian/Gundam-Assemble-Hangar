@@ -7,6 +7,7 @@ from unittest.mock import patch
 from PIL import Image
 
 from companion import card_display
+from companion.artwork import sortie_art
 from companion.asset_pipeline import (DICE_FILES, discover_cards, needed_renders, prepare_assets, publish_assets,
                                      render_fingerprint)
 from companion.card_display import build_display_cache, load_display_image, read_manifest, source_digest, write_manifest
@@ -119,6 +120,28 @@ class AssetPipelineTests(unittest.TestCase):
             prepare_assets(self.root)
         self.assertFalse((self.root / '.build/published').exists())
         self.assertEqual(len(json.loads((self.root / '.build/onboarding.json').read_text())['pending']), 2)
+
+    def test_sortie_front_is_independent_of_printed_front_in_source_and_bundle(self):
+        folder = self.root / 'authoring/cards/Unit Cards'
+        printed = 'img_card_front_st01-u01_en.webp'
+        variant = 'img_card_st01-u01_en.webp'
+        (self.root / 'catalog.json').write_text(json.dumps({'ST01-U01': {
+            'name': 'Gundam', 'title': 'Hero', 'hp': 15, 'vp': 8, 'timeline': 2, 'image': printed}}))
+        (folder / 'SVG/ST01-U01.svg').write_text('<svg/>')
+        Image.new('RGB', (64, 48), 'red').save(folder / variant, lossless=True)
+        record = next(c for c in discover_cards(self.root) if c['number'] == 'ST01-U01')
+        self.assertIn('original WEBP', record['missing'])
+        Image.new('RGB', (64, 48), 'blue').save(folder / printed, lossless=True)
+        self.build()
+        build_display_cache(load_catalog(self.root).values(), self.root, folder=UNIT_CARDS)
+        with patch('companion.asset_pipeline.STATIC_FILES', ()):
+            bundle = publish_assets(self.root, discover_cards(self.root))
+        for root in (self.root, bundle):
+            with self.subTest(root=root):
+                self.assertEqual(load_catalog(root)['ST01-U01'].image, printed)
+                self.assertEqual(sortie_art(printed, root).getpixel((5, 5))[:3], (255, 0, 0))
+                image = load_display_image(printed, 'preview', root, folder=UNIT_CARDS)
+                self.assertEqual(image.getpixel((5, 5))[:3], (0, 0, 255))
 
     def test_duplicate_originals_are_rejected_deterministically(self):
         duplicate = self.original.with_name('img_card_front_st01-t01_en.webp')

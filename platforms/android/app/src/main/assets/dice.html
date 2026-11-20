@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box}
+html,body{height:100%}
+body{display:flex;flex-direction:column;gap:6px;margin:0;padding:8px 12px;background:#192124;color:#f2ede0;font:16px sans-serif}
+main{position:relative;flex:1 0 96px;min-height:0;background:#101819;border:1px solid #485556;border-radius:5px;overflow:hidden}
+canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+#faces{flex:none;max-height:23vh;overflow-y:auto;align-content:flex-start}#faces:empty{display:none}
+nav,output{flex:none}output:empty{display:none}
+#faces button{min-width:44px}
+nav,#faces{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:5px 0}
+button,input{min-height:44px;background:#374346;color:#f2ede0;font:inherit;border:1px solid #667678;border-radius:4px;padding:4px 10px}
+input{width:4.4em;text-align:center}button.primary,button[aria-pressed=true]{background:#ffb762;color:#151a1c}
+button:disabled{opacity:.55}output{display:block;color:#ffcf81;padding:5px 0} [hidden]{display:none!important}
+@font-face{font-family:Chakra;src:url('ChakraPetch-Bold.ttf')}button{font-family:Chakra,sans-serif;background:linear-gradient(#425053,#303a3c);box-shadow:0 2px 2px #101516}nav,output{font-family:monospace}</style>
+<nav><label id="poolLabel">Dice <input id="pool" aria-label="Dice count" type="number" min="1" max="60" value="3"></label>
+<label id="accLabel" hidden>Accuracy <input id="accuracy" type="number" min="-99" max="99" value="0"></label>
+<button id="roll" class="primary">Roll 3 D10s</button><button id="reroll" disabled>Reroll selected</button>
+<button id="disarm" hidden>Resolve Disarm</button></nav>
+<main><canvas aria-label="D10 dice tray"></canvas></main><output aria-live="polite"></output><div id="faces"></div>
+<script src="cannon.js"></script><script src="physics.js"></script><script src="tray.js"></script>

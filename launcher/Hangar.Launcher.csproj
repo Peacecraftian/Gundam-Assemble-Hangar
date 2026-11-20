@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>Hangar.Launcher</AssemblyName>
+    <ApplicationIcon>..\Images\gundam-assemble-hangar.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="tests\**\*.cs" />
+    <Resource Include="Display/terminal-concept.png" />
+    <Resource Include="../.build/launcher/shaders/Tube.ps" Link="Display/Tube.ps" />
+    <Resource Include="..\Fonts\*.ttf" Link="Assets\Fonts\%(Filename)%(Extension)" />
+    <Resource Include="..\Images\gundam-assemble-hangar.png;..\Images\speaker-grille.png;..\Images\sortie-warning.png;..\Images\hangar-chevrons.png;..\Images\hangar-pointer.cur;..\Images\hangar-hand.cur" Link="Assets\%(Filename)%(Extension)" />
+    <Resource Include="..\Images\Navigation\layers.png;..\Images\Navigation\gallery-vertical-end.png;..\Images\Navigation\sliders-vertical.png" Link="Assets\%(Filename)%(Extension)" />
+    <Content Include="launcher.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../.build/launcher/audio/key-press.wav;../.build/launcher/audio/pilot-lock.wav"
+             Link="Audio/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\Fonts\OFL-*.txt;..\Images\Navigation\LICENSE-*.txt;..\LICENSE;..\NOTICE.md" Link="Licenses\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <Target Name="CompileTubeShader" BeforeTargets="PrepareForBuild" Inputs="Display/Tube.hlsl;Display/compile_shader.py" Outputs="../.build/launcher/shaders/Tube.ps">
+    <Exec Command="&quot;$(MSBuildProjectDirectory)\..\.venv\Scripts\python.exe&quot; Display/compile_shader.py ../.build/launcher/shaders/Tube.ps" />
+  </Target>
+  <Target Name="RenderTerminalCues" BeforeTargets="PrepareForBuild" Inputs="Audio/render_cues.py"
+          Outputs="../.build/launcher/audio/key-press.wav;../.build/launcher/audio/pilot-lock.wav">
+    <Exec Command="&quot;$(MSBuildProjectDirectory)\..\.venv\Scripts\python.exe&quot; Audio/render_cues.py ../.build/launcher/audio" />
+  </Target>
+</Project>

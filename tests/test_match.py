@@ -192,6 +192,7 @@ class MatchTests(unittest.TestCase):
         self.assertFalse(self.match.unit(1).deployed)
 
     def test_quick_status_counters_apply_clear_and_undo_without_stacking(self):
+        self.match.deploy_unit(1)
         unit = self.match.unit(1)
         unit.statuses = ["Slow"]
         revision = self.store.save(self.match, 0)
@@ -484,7 +485,7 @@ class MatchTests(unittest.TestCase):
         after_rescue = self.match.to_json()
         revision = self.store.save(self.match, revision)
 
-        self.match.record_garrison(4, 1, GARRISON_DEFEAT)
+        self.match.record_garrison(4, 1, GARRISON_DEFEAT, unpaid_tl=2)
         self.assertEqual(self.match.unit(4), replace(attacker, round=6))
         self.assertEqual(self.match.scores[-1].reason, f"{GARRISON_DEFEAT} · {attacker.label}")
         self.assertEqual((self.match.total(0), self.match.total(1)), (2, 2))

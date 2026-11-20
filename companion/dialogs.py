@@ -5,7 +5,7 @@ from time import monotonic
 from tkinter import font, messagebox, ttk
 
 from .artwork import (
-    decal_art, fitted_card, launch_mark, objective_art, status_art, timeline_portrait, token_art, unit_portrait,
+    decal_art, fitted_card, launch_mark, objective_art, status_art, sortie_art, sortie_card, sortie_portrait, token_art,
     upgrade_art,
 )
 from .attack_overlay import AttackOverlay
@@ -31,8 +31,14 @@ from .window_placement import monitor_bounds
 SORTIE_DECAL_COLORS = ("#66D6C3", "#F6A179")
 
 
+def touch_keyboard(widget, title, **options):
+    from .touch_keyboard import bind_keyboard
+    return bind_keyboard(widget, title, **options)
+
+
 def spinner(parent, variable, first, last, width=5):
-    return ttk.Spinbox(parent, from_=first, to=last, textvariable=variable, width=width)
+    return touch_keyboard(ttk.Spinbox(parent, from_=first, to=last, textvariable=variable, width=width),
+                          "Enter Number", numeric=True)
 
 
 def field(parent, row, label, widget):
@@ -143,11 +149,13 @@ class Dialog:
 
 
 class CardMount(ttk.Frame):
-    def __init__(self, parent, app, *, on_open=None, attacks=(), on_attack=None, **size):
+    def __init__(self, parent, app, *, on_open=None, attacks=(), on_attack=None, sortie=False, **size):
         super().__init__(parent, style="Recess.TFrame", padding=2)
         self.canvas = tk.Canvas(self, background=CELL, highlightthickness=0, **size)
         self.canvas.pack(fill="both", expand=True)
         self.photos = app.photos
+        self.sortie = sortie
+        self.system_links = ttk.Frame(self) if sortie else None
         self.remote = RemoteWeaponOverlay(self.canvas, app)
         self.attack = AttackOverlay()
         self.attacks, self.on_attack = attacks, on_attack
@@ -164,8 +172,24 @@ class CardMount(ttk.Frame):
         self.canvas.bind("<Leave>", self.clear_hover)
 
     def select(self, card):
+        if self.sortie and self.card != card:
+            self.system_links.pack_forget()
+            for link in self.system_links.winfo_children():
+                link.destroy()
+            if card and sortie_art(card.image) is not None:
+                for weapon in self.remote.weapons:
+                    if weapon.parent == card.number:
+                        # Full-art fronts have no printed system hotspot.
+                        ttk.Button(self.system_links, text=weapon.name, style="Compact.TButton",
+                                   command=lambda w=weapon: self.show_system(w)).pack(side="left")
+                if self.system_links.winfo_children():
+                    self.system_links.pack(side="bottom", before=self.canvas)
         self.card = card
         self.draw()
+
+    def show_system(self, weapon):
+        self.remote.active = None if self.remote.active == weapon else weapon
+        self.remote.draw()
 
     def click(self, event):
         self.clicked_remote = self.remote.click(event)
@@ -205,7 +229,8 @@ class CardMount(ttk.Frame):
         canvas.delete("all")
         canvas.configure(cursor="")
         number = self.card.number if self.card else None
-        self.photo = self.photos.get(fitted_card, self.card.image, (width - 24, height - 20)) if self.card else None
+        renderer = sortie_card if self.sortie else fitted_card
+        self.photo = self.photos.get(renderer, self.card.image, (width - 24, height - 20)) if self.card else None
         if self.photo is None:
             self.remote.place(number, None)
             self.attack.place((), None)
@@ -217,36 +242,46 @@ class CardMount(ttk.Frame):
         canvas.create_image(left, top, image=self.photo, anchor="nw")
         registration(canvas, left - 4, top - 4, left + art_width + 4, top + art_height + 4)
         box = left, top, left + art_width, top + art_height
-        self.remote.place(number, box)
+        full_art = self.sortie and sortie_art(self.card.image) is not None
+        self.remote.place(None if full_art else number, box, selection=number)
         self.attack.place(self.attacks, box if self.remote.active is None else None)
 
 
 class SquadRoster(ttk.Frame):
-    def __init__(self, parent, side, player, remove, bind_drag, *, decal=None):
+    def __init__(self, parent, side, player, remove, bind_drag, *, decal=None, photos=None, on_name=None):
         super().__init__(parent, style=f"Hangar{side}.TFrame", padding=(3, 3, 3, 4))
         self.side, self.remove = side, remove
         self.bind_drag = bind_drag
+        self.photos, self.row_photos = photos, []
         header = ttk.Frame(self, style=f"HangarFill{side}.TFrame", padding=(7, 4))
         header.pack(fill="x")
         ttk.Frame(header, width=3, style=f"SideMark{side}.TFrame").pack(side="left", fill="y", padx=(0, 4))
         self.count = ttk.Label(header, style=f"SideMeta{side}.TLabel")
         self.count.pack(side="right")
         heading, _ = families(self)
-        self.name = ttk.Entry(header, textvariable=player, style=f"Name{side}.TEntry", width=9,
-                              font=(heading, -16, "bold"))
+        self.name = ttk.Entry(header, textvariable=player, style=f"TouchSortie.Name{side}.TEntry", width=9,
+                              font=(heading, -19, "bold"))
 
         def edit_name():
-            self.name.focus_set()
-            self.name.selection_range(0, "end")
+            if on_name is not None:
+                on_name()
+            else:
+                self.name.focus_set()
+                self.name.selection_range(0, "end")
 
-        ttk.Button(header, text="✎", style=f"Edit{side}.Icon.TButton", command=edit_name).pack(side="right", padx=4)
+        edit_box = ttk.Frame(header, style=f"HangarFill{side}.TFrame", width=44, height=44)
+        edit_box.pack(side="right", padx=4)
+        edit_box.pack_propagate(False)
+        ttk.Button(edit_box, text="✎", style=f"TouchSortie.Edit{side}.Icon.TButton", command=edit_name).pack(fill="both", expand=True)
         ttk.Label(header, text=f"PLAYER {side + 1}", style=f"SideMeta{side}.TLabel").pack(side="right", padx=(3, 0))
         self.name.pack(side="left", fill="x", expand=True)
+        if on_name is not None:
+            self.name.bind("<ButtonRelease-1>", lambda _event: edit_name())
         viewport = ttk.Frame(self, style="Well.TFrame")
         viewport.pack(fill="both", expand=True)
         self.canvas = tk.Canvas(viewport, background=CELL, highlightthickness=0, width=1, height=96,
                                 yscrollincrement=1)
-        scroll = ttk.Scrollbar(viewport, orient="vertical", command=self.canvas.yview)
+        scroll = ttk.Scrollbar(viewport, orient="vertical", command=self.canvas.yview, style="TouchSortie.Vertical.TScrollbar")
         self.canvas.pack(side="left", fill="both", expand=True)
         self.canvas.configure(yscrollcommand=lambda first, last: overflow_scrollbar(scroll, first, last))
         self.rows = ttk.Frame(self.canvas, style="Well.TFrame")
@@ -342,26 +377,39 @@ class SquadRoster(ttk.Frame):
         count = len(cards)
         self.count.configure(text=f"{count} {'UNIT' if count == 1 else 'UNITS'}")
         self.remove_keys.clear()
+        self.row_photos.clear()
         self.unit_rows.clear()
         if not cards:
             empty = ttk.Label(self.rows, text="No Unit Cards added", style="WellMeta.TLabel", padding=(8, 10))
             empty.pack(anchor="w")
         for index, card in enumerate(cards):
             tk.Frame(self.rows, background=BORDER, height=1).pack(fill="x")
-            row = ttk.Frame(self.rows, style="Well.TFrame", padding=(7, 3))
+            row = ttk.Frame(self.rows, style="Well.TFrame", padding=(8, 7))
             row.pack(fill="x")
             self.unit_rows.append(row)
             badge = ttk.Label(row, text=f"{index + 1:02d}", style=f"Slot{self.side}.TLabel")
             badge.pack(side="left", padx=(0, 6))
-            key = ttk.Button(row, text="−", style="Icon.TButton", command=lambda index=index: self.remove(index))
-            key.pack(side="right")
+            key_box = ttk.Frame(row, style="Well.TFrame", width=44, height=48)
+            key_box.pack(side="right", padx=(6, 0))
+            key_box.pack_propagate(False)
+            key = ttk.Button(key_box, text="−", style="TouchSortie.Icon.TButton", command=lambda index=index: self.remove(index))
+            key.pack(fill="both", expand=True)
             key.bind("<FocusIn>", lambda _event, row=row: self.reveal(row))
             self.remove_keys.append(key)
-            number = ttk.Label(row, text=card.number, style="WellMeta.TLabel")
-            number.pack(side="right", padx=(4, 7))
-            name = ttk.Label(row, text=card.name, width=1, style="RosterRow.TLabel")
-            name.pack(side="left", fill="x", expand=True)
-            for widget in (row, badge, number, name):
+            portrait = ttk.Label(row, style="Well.TLabel")
+            if self.photos is not None:
+                photo = self.photos.get(sortie_portrait, card.image, (54, 38))
+                self.row_photos.append(photo)
+                if photo is not None:
+                    portrait.configure(image=photo)
+            portrait.pack(side="left", padx=(0, 8))
+            details = ttk.Frame(row, style="Well.TFrame")
+            details.pack(side="left", fill="x", expand=True)
+            name = ttk.Label(details, text=card.name, width=1, style="TouchSortie.RosterRow.TLabel")
+            name.pack(fill="x")
+            number = ttk.Label(details, text=card.number, style="TouchSortie.WellMeta.TLabel")
+            number.pack(anchor="w", pady=(3, 0))
+            for widget in (row, badge, portrait, details, number, name):
                 self.bind_drag(widget, index)
         self.rows.update_idletasks()
         self.update_scroll()
@@ -377,10 +425,14 @@ class SquadDragPress:
 
 
 class SetupScreen:
-    PORTRAIT_SIZE = (34, 23)
+    PORTRAIT_SIZE = (60, 42)
+    DRAG_PORTRAIT_SIZE = (34, 23)
     GHOST_SIZE = (206, 58)
 
     def __init__(self, parent, app):
+        from .touch_sortie import setup_sortie_styles
+        setup_sortie_styles(app.root)
+        self.name_keyboard = None
         self.app = app
         self.body = app.workspace.layer(parent)
         self.footer = ttk.Frame(parent, style="Rail.TFrame", padding=(8, 5))
@@ -399,9 +451,11 @@ class SetupScreen:
         self.drag_job = None
         self.drag_ghost = None
 
-        app.workspace.caption(self.body, MISSION_SORTIE).pack(anchor="w")
-        app.workspace.caption(self.body, "Drag catalog cards to add. Reorder squad cards or drop them outside their list to remove.",
-                              "Muted.TLabel").pack(anchor="w", pady=(2, 8))
+        self.heading = app.workspace.caption(self.body, MISSION_SORTIE)
+        self.heading.pack(anchor="w")
+        self.hint = app.workspace.caption(self.body, "Drag catalog cards to add. Reorder squad cards or drop them outside their list to remove.", "Muted.TLabel")
+        self.hint.pack(anchor="w", pady=(2, 8))
+        self.body.bind("<Configure>", self.layout_height, add="+")
         chooser = app.workspace.layer(self.body)
         chooser.pack(fill="both", expand=True)
         for column, weight in enumerate((29, 34, 37)):
@@ -414,12 +468,19 @@ class SetupScreen:
         panel_heading(catalog, "01", "Unit Catalog", spacious=True, decal=catalog_decal).pack(fill="x")
         self.search = tk.StringVar(master=self.body)
         ttk.Label(catalog, text="SEARCH UNIT CARDS", style="Panel.FieldLabel.TLabel").pack(anchor="w", pady=(9, 3))
-        self.initial_focus = ttk.Entry(catalog, textvariable=self.search, width=12, style="Sortie.TEntry")
+        self.initial_focus = ttk.Entry(catalog, textvariable=self.search, width=12, style="TouchSortie.Sortie.TEntry", font=(families(parent)[0], -18))
         self.initial_focus.pack(fill="x", pady=(0, 7))
+        touch_keyboard(self.initial_focus, "Search Unit Catalog", live=True)
         catalog_table, self.cards = table(catalog, (
             ("name", "UNIT", 67, True), ("number", "CARD ID", 73, False),
             ("hp", "HP", 43, False), ("vp", "VP", 29, False),
-        ), height=8, style="Catalog.Treeview", portraits=True, on_scroll=self.queue_portraits)
+        ), height=8, style="TouchSortie.Catalog.Treeview", portraits=True, on_scroll=self.queue_portraits)
+        self.cards.column("#0", width=72, minwidth=72)
+        self.cards.column("number", width=100, minwidth=100)
+        self.cards.bind("<Configure>", self.layout_catalog, add="+")
+        for child in catalog_table.winfo_children():
+            if isinstance(child, ttk.Scrollbar):
+                child.configure(style="TouchSortie.Vertical.TScrollbar")
         self.hp_photo = app.photos.get(token_art, "hp", 14)
         self.cards.heading("hp", image=self.hp_photo)
         for stat in ("hp", "vp"):
@@ -454,7 +515,8 @@ class SetupScreen:
             reading = ttk.Label(tile, style="Stat.TLabel")
             reading.pack(anchor="w")
             self.card_stats.append(reading)
-        self.mount = CardMount(inspection, app, on_open=lambda card: show_card(app, card), width=145, height=100)
+        self.mount = CardMount(inspection, app, sortie=True, on_open=lambda card: show_card(app, card, sortie=True),
+                               width=145, height=100)
         self.mount.pack(fill="both", expand=True, pady=(5, 0))
         def wrap_inspection(event):
             for label in (self.card_title, self.card_meta):
@@ -474,18 +536,20 @@ class SetupScreen:
         ttk.Label(options, text="SCENARIO (OPTIONAL)", style="Panel.FieldLabel.TLabel").grid(row=0, column=0, sticky="w")
         ttk.Label(options, text="PHASES", style="Panel.FieldLabel.TLabel").grid(row=0, column=1, sticky="w")
         self.scenarios, scenario_labels = scenario_choices(app.store)
-        self.scenario = ttk.Combobox(options, state="readonly", values=[NO_SCENARIO, *scenario_labels], width=8)
+        self.scenario = ttk.Combobox(options, state="readonly", values=[NO_SCENARIO, *scenario_labels], width=8,
+                                     style="TouchSortie.TCombobox", font=(families(parent)[0], -16))
         self.scenario.current(0)
         self.scenario.grid(row=1, column=0, sticky="nsew", padx=(0, 8), pady=(3, 0))
         stepper = ttk.Frame(options, style="Well.TFrame")
         stepper.grid(row=1, column=1, sticky="nsew", pady=(3, 0))
-        self.phase_down = ttk.Button(stepper, text="−", style="Icon.TButton", command=lambda: self.step_phases(-1))
+        self.phase_down = ttk.Button(stepper, text="−", style="TouchSortie.Icon.TButton", width=2, command=lambda: self.step_phases(-1))
         self.phase_down.pack(side="left", fill="y")
-        self.phase_entry = ttk.Entry(stepper, textvariable=self.phases, width=4, justify="center", style="Step.TEntry")
+        self.phase_entry = ttk.Entry(stepper, textvariable=self.phases, width=4, justify="center", style="TouchSortie.Step.TEntry", font=(families(parent)[1], -18))
         self.phase_entry.pack(side="left", fill="y")
+        touch_keyboard(self.phase_entry, "Match Phases", numeric=True)
         self.phase_entry.bind("<Up>", lambda _event: self.step_phases(1))
         self.phase_entry.bind("<Down>", lambda _event: self.step_phases(-1))
-        ttk.Button(stepper, text="+", style="Icon.TButton", command=lambda: self.step_phases(1)).pack(
+        ttk.Button(stepper, text="+", style="TouchSortie.Icon.TButton", width=2, command=lambda: self.step_phases(1)).pack(
             side="left", fill="y",
         )
         actions = ttk.Frame(squads, style="PanelFill.TFrame")
@@ -496,19 +560,20 @@ class SetupScreen:
                 squads, side, self.players[side], lambda index, side=side: self.remove_card(side, index),
                 lambda widget, index, side=side: self.bind_roster_drag(widget, side, index),
                 decal=app.photos.get(decal_art, "sortie-arrow", SORTIE_DECAL_COLORS[side]),
+                photos=app.photos, on_name=lambda side=side: self.edit_player_name(side),
             )
             roster.grid(row=side + 2, sticky="nsew", pady=(0, 7))
             self.roster_views.append(roster)
-            add = ttk.Button(actions, text=f"+  Add To Player {side + 1}", style=f"Side{side}.TButton",
+            add = ttk.Button(actions, text=f"+  Add To Player {side + 1}", style=f"TouchSortie.Side{side}.TButton",
                              command=lambda side=side: self.add_card(side))
             add.grid(row=0, column=side, sticky="ew", padx=(0, 6 if side == 0 else 0))
             self.add_buttons.append(add)
 
         self.readiness = ttk.Label(self.footer, style="Attention.TLabel", width=1)
         self.readiness.pack(side="left", fill="x", expand=True, padx=(0, 8))
-        self.start_button = FooterButton(self.footer, text="Start Match", style="Primary.TButton", command=self.start)
+        self.start_button = ttk.Button(self.footer, text="Start Match", style="TouchSortie.Primary.TButton", command=self.start)
         self.start_button.pack(side="right")
-        FooterButton(self.footer, text="Cancel", style="Quiet.TButton", command=app.cancel_setup).pack(
+        ttk.Button(self.footer, text="Cancel", style="TouchSortie.Quiet.TButton", command=app.cancel_setup).pack(
             side="right", padx=(0, 8),
         )
         self.traces = [(variable, variable.trace_add("write", self.update_ready))
@@ -518,6 +583,26 @@ class SetupScreen:
         self.filter_cards()
         for side in range(2):
             self.show_roster(side)
+
+    def layout_height(self, _event=None):
+        # Keep a complete touch-sized squad row visible on a 768px desktop.
+        # Navigation already names this page, so its oversized caption can yield.
+        if self.app.root.winfo_height() < 800:
+            self.heading.pack_forget()
+        elif not self.heading.winfo_manager():
+            self.heading.pack(anchor="w", before=self.hint)
+
+    def layout_catalog(self, event):
+        columns = ("name", "number") if event.width < 480 else ("name", "number", "hp", "vp")
+        if tuple(self.cards.cget("displaycolumns")) != columns:
+            self.cards.configure(displaycolumns=columns)
+
+    def edit_player_name(self, side):
+        from .touch_sortie import PlayerNameKeyboard
+        if self.name_keyboard is not None and self.name_keyboard.window.winfo_exists():
+            self.name_keyboard.window.lift()
+            return
+        self.name_keyboard = PlayerNameKeyboard(self.app.root, self.players[side], side)
 
     def place_squad_warning(self, chooser, squads):
         self.warning_photo = self.app.photos.get(decal_art, "sortie-warning")
@@ -551,7 +636,7 @@ class SetupScreen:
                        key=lambda card: (card.name.casefold(), card.number))
         for index, card in enumerate(cards):
             if card.number not in self.catalog_photos:
-                photo = self.app.photos.get(unit_portrait, card.image, self.PORTRAIT_SIZE, load=False)
+                photo = self.app.photos.get(sortie_portrait, card.image, self.PORTRAIT_SIZE, load=False)
                 if photo is not None:
                     self.catalog_photos[card.number] = photo
             self.cards.insert("", "end", iid=card.number, image=self.catalog_photos.get(card.number, ""),
@@ -578,13 +663,17 @@ class SetupScreen:
         # Leave room for painting and input between batches of card image decodes.
         for number in missing[:2]:
             filename = self.app.catalog[number].image
-            photo = self.app.photos.get(unit_portrait, filename, self.PORTRAIT_SIZE)
+            photo = self.app.photos.get(sortie_portrait, filename, self.PORTRAIT_SIZE)
             self.catalog_photos[number] = photo if photo is not None else ""
             self.cards.item(number, image=self.catalog_photos[number])
         if len(missing) > 2:
             self.queue_portraits()
 
     def dispose(self, _event):
+        if _event.widget is not self.body:
+            return
+        if self.name_keyboard is not None and self.name_keyboard.window.winfo_exists():
+            self.name_keyboard.cancel()
         if self.drag_job is not None:
             self.body.after_cancel(self.drag_job)
         if self.portrait_job is not None:
@@ -753,7 +842,7 @@ class SetupScreen:
         ghost.delete("all")
         ghost.create_polygon(point(-94, -15), point(94, -15), point(94, 15), point(-94, 15),
                              fill=PANEL, outline=AMBER)
-        ghost.photo = self.app.photos.get(timeline_portrait, card.image, self.PORTRAIT_SIZE, angle)
+        ghost.photo = self.app.photos.get(sortie_portrait, card.image, self.DRAG_PORTRAIT_SIZE, angle)
         if ghost.photo is not None:
             ghost.create_image(*point(-73, 0), image=ghost.photo)
         ghost.create_text(*point(-52, 0), text=self.drag_title, fill=INK,
@@ -977,6 +1066,7 @@ class UnitDialog(Dialog):
         field(fields, 2, "Stack Position", self.ranks)
         notes = ttk.Entry(fields, textvariable=self.note, width=15)
         field(fields, 3, "Token Notes", notes)
+        touch_keyboard(notes, "Unit Token Notes")
         self.inputs.extend((self.ranks, notes))
         self.phase.trace_add("write", self.update_ranks)
         self.round.trace_add("write", self.update_ranks)
@@ -1054,8 +1144,10 @@ class UnitDialog(Dialog):
                 active = variable.get()
                 button.configure(image=self.status_photos[status, active])
                 button.state(["selected"] if active else ["!selected"])
+                button.state(['disabled'] if self.read_only or (self.deployment.get() == 'Reserve' and not active) else ['!disabled'])
 
             variable.trace_add("write", update)
+            self.deployment.trace_add("write", update)
             update()
         if not self.read_only:
             self.reserve_button = ttk.Button(
@@ -1084,6 +1176,7 @@ class UnitDialog(Dialog):
                   image=photo).pack(side="left")
         entry = ttk.Entry(heading, textvariable=value, width=5, justify="center")
         entry.pack(side="right")
+        touch_keyboard(entry, label, numeric=True)
         self.fields[label] = entry
         self.inputs.append(entry)
         for key, delta in (("<Up>", 1), ("<Down>", -1)):
@@ -1280,13 +1373,13 @@ class UnitDialog(Dialog):
             self.status.configure(text="Draft retained · Check the save or entry.", style="Error.TLabel")
 
 
-def show_card(app, card, *, parent=None, unit_id=None, attacks=(), on_attack=None):
+def show_card(app, card, *, parent=None, unit_id=None, attacks=(), on_attack=None, sortie=False):
     dialog = Dialog(parent or app.root, "Unit Card")
     dialog.workspace.caption(dialog.body, card.name).pack(anchor="w")
     dialog.workspace.caption(dialog.body, f"{card.title} · {card.number}", "Muted.TLabel").pack(anchor="w")
     screen_width, screen_height = app.root.winfo_screenwidth(), app.root.winfo_screenheight()
     launch = (lambda profile=None: on_attack(dialog.window, profile)) if on_attack is not None else None
-    mount = CardMount(dialog.body, app, attacks=attacks, on_attack=launch,
+    mount = CardMount(dialog.body, app, attacks=attacks, on_attack=launch, sortie=sortie,
                       width=min(840, screen_width - 100), height=min(600, screen_height - 230))
     mount.select(card)
     mount.pack(fill="both", expand=True, pady=(5, 0))
@@ -1327,6 +1420,8 @@ def show_card(app, card, *, parent=None, unit_id=None, attacks=(), on_attack=Non
     for column, button in enumerate(reversed(actions), 1):
         dialog.footer.columnconfigure(column, uniform="card_actions")
         button.grid(row=0, column=column, sticky="nsew", padx=(6, 0))
+    from .card_gestures import CardDismissGesture
+    dialog.dismiss_gesture = CardDismissGesture(dialog, mount)
     dialog.show()
     return dialog
 
@@ -1421,7 +1516,7 @@ class ScoreDialog(Dialog):
         fields.columnconfigure(0, weight=3)
         fields.columnconfigure(1, weight=2)
         self.targets = UnitPicker(fields, app)
-        self.points_field = ttk.Entry(fields, textvariable=self.points, width=8)
+        self.points_field = touch_keyboard(ttk.Entry(fields, textvariable=self.points, width=8), "Victory Points", numeric=True)
         self.reason_picker = ttk.Combobox(fields, values=tuple(self.REASON_LABELS.values()), state="readonly", width=19)
         self.reason_picker.set(self.REASON_LABELS[reason])
         self.remote_defeat = ttk.Frame(fields, style="PanelFill.TFrame")
@@ -1431,7 +1526,7 @@ class ScoreDialog(Dialog):
             (0, 0, 1, "REASON", self.reason_picker),
             (0, 1, 1, "PHASE", spinner(fields, self.phase, 1, app.match.phases)),
             (2, 0, 2, "UNIT", self.targets),
-            (5, 0, 1, "NOTE (OPTIONAL)", ttk.Entry(fields, textvariable=self.note, width=18)),
+            (5, 0, 1, "NOTE (OPTIONAL)", touch_keyboard(ttk.Entry(fields, textvariable=self.note, width=18), "Scoring Note")),
             (5, 1, 1, "VP ADJUSTMENT", self.points_field),
         ):
             padx = (0, 8) if column == 0 and span == 1 else 0
@@ -1484,7 +1579,9 @@ class ScoreDialog(Dialog):
         if unit_action and not unit_defeat:
             if self.targets.current() < 0:
                 preselect_unit(self.targets, units, self.app.selected_id)
-            self.hint.configure(text=f"Awards {GARRISON_POINTS} VP and advances the acting unit two Timeline spaces."
+            hint = ('Award 2 VP for a defeat resolved at the table. Enter only unpaid TL.' if reason == GARRISON_DEFEAT
+                    else 'Award 2 VP and advance the rescuing unit two Timeline spaces.')
+            self.hint.configure(text=hint
                                 if units else "This player has no deployed units.")
         elif not unit_action:
             self.hint.configure(text="Use a negative adjustment to correct a score.")
@@ -1566,7 +1663,8 @@ class ScoreDialog(Dialog):
             elif reason == UNIT_DEFEAT:
                 match.defeat_unit(unit.id, phase, note=note, defeated_weapons=defeated_weapons)
             elif reason in self.UNIT_ACTIONS:
-                match.record_garrison(unit.id, phase, reason, note=note)
+                match.record_garrison(unit.id, phase, reason, note=note,
+                                      unpaid_tl=self.unpaid_tl.get() if hasattr(self, 'unpaid_tl') else 0)
             else:
                 match.record_score(self.player, phase, self.points.get(), f"{reason} · {note}" if note else reason)
 

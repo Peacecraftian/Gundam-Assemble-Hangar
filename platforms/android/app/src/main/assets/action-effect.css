@@ -1,0 +1,10 @@
+@font-face{font-family:Chakra;src:url('ChakraPetch-Bold.ttf')}
+*{box-sizing:border-box}
+body{margin:0;height:100vh;overflow:hidden;color:var(--accent);text-align:center;font:16px Chakra,sans-serif}
+img{position:absolute;bottom:27%;left:50%;transform:translateX(-50%);width:auto;height:69%;max-width:100%;object-fit:contain;image-rendering:pixelated;animation:clear var(--duration) step-end forwards}
+strong{position:absolute;left:50%;bottom:5%;min-width:54%;padding:5px 15px;background:#191f21;border:1px solid #596565;border-top:2px solid var(--accent);line-height:1.1;animation:notice 3.05s both}
+small{display:block;font:13px monospace;color:#f2ede0;margin-top:3px}small span{display:none}small span:target{display:inline}
+.card-action strong{width:max-content;max-width:96%}
+@media(max-height:200px){.card-action strong{font-size:14px;padding:3px 8px}.card-action small{font-size:11px;margin-top:1px}}
+@keyframes notice{0%,6%{opacity:0;transform:translate(-50%,110%)}18%,75%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,110%)}}
+@keyframes clear{to{visibility:hidden}}

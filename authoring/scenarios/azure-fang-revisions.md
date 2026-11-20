@@ -2,6 +2,16 @@
 
 Stable bundled ID: `official-azure-fang`. Display name remains `Operation Azure Fang`.
 
+## Deployment zones restored — incorporated 2026-11-16
+
+Source: [saved Battlefield export](export-official-azure-fang-deployment-20261116.json), captured from the user's updated `Operation Azure Fang REV2` custom scenario at local edit revision 1. This records the user's map correction, not a new publisher-issued revision.
+
+- `01-08`: replace the red Garrison with a red deployment base.
+- `13-08`: replace the blue Garrison with a blue deployment base.
+- Elevation at both hexes remains Height 1. All other hexes, objective numbers, briefing text, location and Jungle palette are unchanged.
+- Keep `official-azure-fang` and the unsuffixed display name, so existing official-scenario match links resolve to the corrected map.
+- Prior exports are retained unchanged; the local custom scenario and saved match are not modified.
+
 ## REV2 — incorporated 2026-11-10
 
 Source: [Operation Azure Fang REV2 export](export-official-azure-fang-rev2.json), captured from the user's saved Battlefield scenario `local-b77f30474a1146ce8dd8b08ae5057a55`, local edit revision 1. This is the user's authoring revision, not a claim of a new publisher-issued rules revision.

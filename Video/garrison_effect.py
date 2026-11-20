@@ -136,8 +136,9 @@ def explosion_frame(frame):
     return image
 
 
-def particles():
-    rng = Random()
+def particles(rng=None):
+    if rng is None:
+        rng = Random()
     return [(rng.uniform(-1, 1), rng.uniform(.55, 1.2), rng.uniform(.45, 1),
              rng.uniform(0, 2 * pi), rng.uniform(2, 6)) for _ in range(68)]
 
@@ -187,7 +188,7 @@ def rescue_sprite(kind, frame):
     return image.rotate(frame * 22.5, resample=Image.Resampling.NEAREST)
 
 
-def draw_rescue_pickups(canvas, width, height, seconds, sparks):
+def rescue_pickups(width, height, seconds, sparks):
     # A few guaranteed pickups stay distinct from the larger confetti burst.
     pickups = (("ring", -.90, 1.05), ("sidearm", -.48, 1.18),
                ("ammo", -.70, .88), ("ring", -.08, 1.26),
@@ -195,9 +196,6 @@ def draw_rescue_pickups(canvas, width, height, seconds, sparks):
                ("ring", .80, 1.08), ("ammo", .96, .87))
     scale = min(1.2, height / 330)
     span = min(width * .43, 315 * scale)
-    photos = getattr(canvas, "_rescue_photos", None)
-    if photos is None:
-        canvas._rescue_photos = photos = {}
     for i, (kind, direction, speed) in enumerate(pickups):
         age = seconds - .06 - (i % 3) * .09
         if not 0 < age < 1.95:
@@ -206,20 +204,45 @@ def draw_rescue_pickups(canvas, width, height, seconds, sparks):
         phase = sparks[i][3] if i < len(sparks) else i
         frame = int(phase + age * (13 if kind == "ring" else 7)) % 16
         size = max(1, round((40 if kind == "sidearm" else 34) * scale))
+        x = width / 2 + direction * span * min(1, age / 1.65)
+        y = height - 13 - scale * (speed * 370 * age - 225 * age * age)
+        yield x, y, kind, frame, size
+
+
+def draw_rescue_pickups(canvas, width, height, seconds, sparks):
+    photos = getattr(canvas, "_rescue_photos", None)
+    if photos is None:
+        canvas._rescue_photos = photos = {}
+    for x, y, kind, frame, size in rescue_pickups(width, height, seconds, sparks):
         key = (kind, frame, size)
         if key not in photos:
             photos[key] = ImageTk.PhotoImage(
                 rescue_sprite(kind, frame).resize((size, size), Image.Resampling.NEAREST), master=canvas)
-        x = width / 2 + direction * span * min(1, age / 1.65)
-        y = height - 13 - scale * (speed * 370 * age - 225 * age * age)
         canvas.create_image(x, y, image=photos[key], tags=("rescue-pickup", kind))
+
+
+def rescue_confetti(width, height, seconds, sparks, color):
+    t = seconds / 1.6
+    x, ground = width / 2, height - 13
+    scale = min(1.2, height / 330)
+    colors = (color, "#ffcb7a", "#f4eccc", "#8be0c7")
+    for i, (dx, speed, life, angle, size) in enumerate(sparks):
+        age = t - (i % 11) * .023
+        if not 0 < age < life:
+            continue
+        cx = x + dx * (30 + age * 315) * scale
+        y = ground - scale * (speed * 470 * age - 260 * age * age)
+        cx += sin(angle + 10 * age) * 11 * scale
+        r = size * scale * (1 - .6 * age / life)
+        spin = angle + age * 9
+        points_xy = [coord for j in range(4) for coord in
+                     (cx + cos(spin + j*pi/2)*r, y + sin(spin + j*pi/2)*r)]
+        yield points_xy, colors[i % len(colors)]
 
 
 def draw_garrison(canvas, width, height, t, rescue, side, points, sparks):
     canvas.delete("all")
     seconds = t * GARRISON_EFFECT_SECONDS
-    # Keep particle motion brisk when extending the notification's lifetime.
-    t = seconds / 1.6
     x = width / 2
     ground = height - 13
     scale = min(1.2, height / 330)
@@ -234,21 +257,9 @@ def draw_garrison(canvas, width, height, t, rescue, side, points, sparks):
             canvas._garrison_sprite_key = key
         canvas.create_image(x, ground + 8, image=canvas._garrison_sprite, anchor="s")
 
-    colors = (color, "#ffcb7a", "#f4eccc", "#8be0c7")
-    for i, (dx, speed, life, angle, size) in enumerate(sparks if rescue else ()):
-        age = t - (i % 11) * .023
-        if not 0 < age < life:
-            continue
-        cx = x + dx * (30 + age * 315) * scale
-        y = ground - scale * (speed * 470 * age - 260 * age * age)
-        cx += sin(angle + 10 * age) * 11 * scale
-        r = size * scale * (1 - .6 * age / life)
-        spin = angle + age * 9
-        points_xy = [coord for j in range(4) for coord in
-                     (cx + cos(spin + j*pi/2)*r, y + sin(spin + j*pi/2)*r)]
-        canvas.create_polygon(points_xy, fill=colors[i % len(colors)])
-
     if rescue:
+        for polygon, fill in rescue_confetti(width, height, seconds, sparks, color):
+            canvas.create_polygon(polygon, fill=fill)
         draw_rescue_pickups(canvas, width, height, seconds, sparks)
 
     draw_placard(canvas, width, height, seconds,
@@ -265,8 +276,9 @@ def draw_placard(canvas, width, height, seconds, title, detail, color):
         rest_y = ground - height * .30
         y = ground + 50 - (1 - (1 - rise) ** 3) * (height * .30 + 50)
         y += (height + 30 - rest_y) * retreat
-        canvas.create_rectangle(x-125, y-28, x+125, y+28, outline=BORDER, fill=CELL, width=2)
-        canvas.create_line(x-125, y-28, x+125, y-28, fill=color, width=2)
+        half_width = min(125, (width - 4) / 2)
+        canvas.create_rectangle(x-half_width, y-28, x+half_width, y+28, outline=BORDER, fill=CELL, width=2)
+        canvas.create_line(x-half_width, y-28, x+half_width, y-28, fill=color, width=2)
         canvas.create_text(x, y-11, text=title,
                            fill=color, font=("TkDefaultFont", -14, "bold"))
         canvas.create_text(x, y+10, text=detail, fill=INK,

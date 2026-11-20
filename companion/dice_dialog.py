@@ -62,7 +62,7 @@ class DicePrompt(Dialog):
             row=6, columnspan=2, sticky="w", pady=(6, 0),
         )
         if unit:
-            ttk.Label(panel, text="Check range, line of sight and Timeline cost at the table.",
+            ttk.Label(panel, text="Check range and line of sight at the table before declaring.",
                       style="PanelMuted.TLabel").grid(row=7, columnspan=2, sticky="w", pady=(4, 0))
         if unit and app is not None:
             self.targets = [target for target in app.match.units if target.deployed and target.player != unit.player]
@@ -84,6 +84,10 @@ class DicePrompt(Dialog):
         self.strength.trace_add("write", self.update_pool)
         self.update_pool()
         self.show()
+
+    def create_tray(self, *args, **kwargs):
+        from .status_rules import StatusDiceTray
+        return StatusDiceTray(*args, **kwargs)
 
     def attack(self):
         return self.profiles[self.weapon.current()] if self.unit else None
@@ -121,10 +125,14 @@ class DicePrompt(Dialog):
             self.error(str(error))
             return
         attack = self.attack()
+        if attack and target is not None:
+            if not self.app.edit(lambda m: m.declare_attack(self.unit.id, target.id, attack, count, accuracy), self.window):
+                return
+            self.revision = self.app.revision
         title = f"{self.unit.label}  /  {attack.name}" if attack else "Free Roll"
         parent = self.window.master
         self.window.destroy()
-        DiceTray(parent, title, count, accuracy, self.unit.player if attack else None,
+        self.create_tray(parent, title, count, accuracy, self.unit.player if attack else None,
                  app=self.app, attacker=self.unit, target=target, weapon=attack, revision=self.revision)
 
 
@@ -170,7 +178,7 @@ class DiceTray(Dialog):
             resolution = ttk.Frame(self.body, style="Panel.TFrame", padding=(9, 6))
             resolution.pack(fill="x", pady=(0, 6))
             resolution.columnconfigure(0, weight=1)
-            ttk.Label(resolution, text=f"TARGET  ·  {target.label}", style="Panel.TLabel", wraplength=420).grid(
+            ttk.Label(resolution, text=f"TARGET  ·  {target.label}    |    Weapon TL {weapon.timeline}", style="Panel.TLabel", wraplength=420).grid(
                 row=0, column=0, sticky="w")
             modifiers = ttk.Frame(resolution, style="PanelFill.TFrame")
             modifiers.grid(row=0, column=1, sticky="e")
@@ -405,7 +413,8 @@ class DiceTray(Dialog):
         if self.selected:
             self.reroll_button.state(["!disabled"])
         attack = self.side is not None
-        results = [die_result(value, accuracy) for value in self.values] if attack else ["roll"] * len(self.values)
+        card_number = self.attacker.card.number if self.attacker else None
+        results = [die_result(value, accuracy, card_number) for value in self.values] if attack else ["roll"] * len(self.values)
         criticals = results.count("critical")
         hits = results.count("hit") + criticals
         if self.target is not None:
@@ -483,7 +492,7 @@ class DiceTray(Dialog):
         self.apply_button.state(["disabled"])
         outcome = []
         saved = self.app.edit(lambda match: outcome.append(match.resolve_attack(
-            self.attacker.id, self.target.id, hits, modifier=modifier,
+            self.attacker.id, self.target.id, hits, timeline_cost=self.weapon.timeline, modifier=modifier,
             note=f"{self.attacker.label} / {self.weapon.name}")), self.window)
         if not saved:
             self.applying = False

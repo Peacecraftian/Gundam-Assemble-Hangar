@@ -5,15 +5,19 @@ from tkinter import font, messagebox, ttk
 
 from .artwork import PhotoCache, decal_art, objective_art
 from .attacks import load_attacks
-from .board import CardPreview, Hangar, Timeline, fit_text
+from .board import Timeline, fit_text
+from .touch_cards import TouchCardPreview as CardPreview, TouchHangar as Hangar
 from .battlefield import BattlefieldScreen
 from .catalog import ROUNDS, load_remote_weapons, load_tactics
 from Video.playback import DeploymentOverlay
 from .dialogs import (
-    Dialog, ScoreDialog, SetupScreen, TimelineActionDialog, UnitDialog, show_card, show_finish, show_history, spinner,
+    Dialog, SetupScreen, show_card, show_finish, show_history, spinner,
     table,
 )
-from .dice_dialog import DicePrompt
+from .touch_actions import TouchDicePrompt as DicePrompt, TouchTimelineAction as TimelineActionDialog
+from .touch_service import TouchUnitDialog as UnitDialog
+from .touch_scores import TouchScoreDialog as ScoreDialog
+from .touch_scores_panel import PlayerScorePanel
 from .match import GARRISON_DEFEAT, GARRISON_RESCUE, UNIT_DEFEAT
 from .storage import SaveConflict
 from .tactics import TacticsScreen
@@ -40,7 +44,7 @@ def score_text(points):
 class Companion:
     def __init__(self, root, catalog, store):
         self.root = root
-        self.deployment = DeploymentOverlay(root)
+        self.deployment = DeploymentOverlay(root, self.card_screen_bounds)
         self.photos = PhotoCache(root)
         self.catalog = catalog
         self.attacks = load_attacks(catalog)
@@ -196,114 +200,23 @@ class Companion:
         self.feedback_label.pack(side="left", fill="x", expand=True)
 
     def scoreboard(self):
-        match = self.match
         board = self.workspace.layer(self.view)
-        board.grid(row=1, column=0, sticky="ew", pady=(0, MATCH_SECTION_GAP))
-        board.columnconfigure((0, 2), weight=1, uniform="scores")
-        self.score_readouts = []
-        for side, column in enumerate((0, 2)):
-            outer = "w" if side == 0 else "e"
-            mark_pad = (7, 0) if side == 0 else (0, 7)
-            score_pad = (0, 8) if side == 0 else (8, 0)
-            tile = ttk.Frame(board, style=f"Hangar{side}.TFrame", padding=(10, 4))
-            tile.grid(row=0, column=column, sticky="nsew")
-            heading = ttk.Frame(tile, style=f"HangarFill{side}.TFrame")
-            heading.pack(fill="x")
-            heading.columnconfigure(1, weight=1)
-            ttk.Frame(heading, style=f"SideMark{side}.TFrame", width=3).grid(
-                row=0, column=2 - column, sticky="ns", padx=mark_pad,
-            )
-            total = score_text(match.total(side))
-            if match.winner is None:
-                score = ttk.Button(
-                    heading, text=total, style=f"Score.Side{side}.TButton", cursor=app_cursor(heading, "hand2"),
-                    command=lambda side=side: ScoreDialog(self, side, reason=ScoreDialog.ADJUST_VP),
-                )
-            else:
-                score = ttk.Label(heading, text=total, style=f"Score{side}.TLabel")
-            self.score_readouts.append(score)
-            score.grid(row=0, column=column, sticky=outer, padx=score_pad, pady=4)
-            self.score_identity(heading, side)
-            if match.winner is None:
-                self.scoring_buttons(tile, side)
-
-        center = ttk.Frame(board, style="Panel.TFrame", padding=(8, 5))
-        center.grid(row=0, column=1, sticky="nsew", padx=8)
-        if match.winner is None:
+        board.grid(row=1, column=0, sticky='ew', pady=(0, MATCH_SECTION_GAP))
+        board.columnconfigure((0, 2), weight=1, uniform='scores')
+        self.score_panels = [PlayerScorePanel(board, self, side) for side in (0, 1)]
+        for side, panel in enumerate(self.score_panels):
+            panel.grid(row=0, column=side * 2, sticky='nsew')
+        self.score_readouts = [panel.score for panel in self.score_panels]
+        center = ttk.Frame(board, style='Panel.TFrame', padding=(8, 5))
+        center.grid(row=0, column=1, sticky='nsew', padx=8)
+        if self.match.winner is None:
             self.controls_header(center)
             self.cursor_controls(center)
         else:
-            winner = shortened(match.players[match.winner], 25)
-            panel_heading(center, "FINAL", f"{winner} wins").pack(fill="x")
-            ttk.Label(center, text=f"Phase {match.phase:02d}  ·  Round {match.round:02d}  ·  Match complete",
-                      style="PanelMuted.TLabel").pack(expand=True, pady=4)
-
-    def score_identity(self, heading, side):
-        identity = tk.Canvas(heading, width=1, height=1, background=HANGARS[side], highlightthickness=0,
-                             borderwidth=0, takefocus=False)
-        identity.grid(row=0, column=1, sticky="nsew")
-        identity.warning_photo = self.photos.get(decal_art, "score-warning")
-        warning = identity.create_image(0, 0, image=identity.warning_photo, state="hidden", tags=("score_decal",))
-        meta = ttk.Label(identity, text=f"PLAYER {side + 1}  /  VP", style=f"SideMeta{side}.TLabel")
-        inner, outer = ("e", "w") if side == 0 else ("w", "e")
-        name_style = f"PlayerName{side}.TLabel"
-        label = ttk.Label(identity, style=name_style, compound="left", anchor=inner)
-        label.objective_photo = self.photos.get(objective_art, side)
-        label.configure(image=label.objective_photo)
-        name = shortened(self.match.players[side], 48)
-
-        def arrange(_event):
-            width, height = identity.winfo_width(), identity.winfo_height()
-            face = font.Font(root=label, font=ttk.Style(label).lookup(name_style, "font"))
-            available = width - label.objective_photo.width() - 6
-            text = fit_text(name, available, face) if available >= face.measure("…") else ""
-            if text != label.cget("text"):
-                label.configure(text=text)
-            label_height, meta_height = label.winfo_reqheight(), meta.winfo_reqheight()
-            content_height = label_height + meta_height
-            if int(identity.cget("height")) != content_height:
-                identity.configure(height=content_height)
-            center = (height + meta_height - label_height) // 2
-            relx = 1 - side
-            meta.place(relx=relx, y=center, anchor=f"s{inner}")
-            label.place(relx=relx, y=center, anchor=f"n{inner}")
-            photo = identity.warning_photo
-            padding = 16
-            fits = (photo is not None and width - max(meta.winfo_reqwidth(), label.winfo_reqwidth()) >=
-                    photo.width() + 2 * padding and height >= photo.height() + 8)
-            identity.coords(warning, padding if side == 0 else width - padding, height / 2)
-            identity.itemconfigure(warning, anchor=outer, state="normal" if fits else "hidden")
-
-        identity.bind("<Configure>", arrange)
-        label.bind("<<ThemeChanged>>", arrange)
-
-    def scoring_buttons(self, parent, side):
-        row = ttk.Frame(parent, style=f"HangarFill{side}.TFrame")
-        row.pack(fill="x", pady=(2, 0))
-        labels = ScoreDialog.REASON_LABELS
-        goal_reason = ScoreDialog.SCENARIO_GOAL
-        timeline_actions = ("Dash", "Energize")
-        full = (*timeline_actions, "Garrison Defeat", labels[GARRISON_RESCUE], labels[UNIT_DEFEAT], labels[goal_reason])
-        short = (*timeline_actions, "Garr. Defeat", "Rescue", labels[UNIT_DEFEAT], "Goal")
-        tight = (*timeline_actions, "Garr. KO", "Rescue", "Unit KO", "Goal")
-        actions = [lambda action=action: TimelineActionDialog(self, side, action) for action in timeline_actions]
-        actions.extend(lambda reason=reason: ScoreDialog(self, side, reason=reason)
-                       for reason in (GARRISON_DEFEAT, GARRISON_RESCUE, UNIT_DEFEAT, goal_reason))
-        buttons = []
-        for label, action in zip(full, actions):
-            button = ttk.Button(row, text=label, style="Scoring.Compact.TButton", command=action)
-            button.pack(side="left", fill="x", expand=True, padx=(0, 1))
-            buttons.append(button)
-
-        def resize(event):
-            face = font.Font(root=row, font=ttk.Style(row).lookup("Scoring.Compact.TButton", "font"))
-            labels = next((labels for labels in (full, short)
-                           if sum(face.measure(label) + 8 for label in labels) <= event.width), tight)
-            for button, label in zip(buttons, labels):
-                if button.cget("text") != label:
-                    button.configure(text=label)
-
-        row.bind("<Configure>", resize)
+            winner = shortened(self.match.players[self.match.winner], 25)
+            panel_heading(center, 'FINAL', f'{winner} wins').pack(fill='x')
+            ttk.Label(center, text=f'Phase {self.match.phase:02d}  ·  Round {self.match.round:02d}  ·  Match complete',
+                      style='PanelMuted.TLabel').pack(expand=True, pady=4)
 
     def controls_header(self, parent):
         header = ttk.Frame(parent, style="Housing.TFrame", padding=(7, 3))
@@ -535,6 +448,16 @@ class Companion:
         self.preview = CardPreview(row, self)
         self.preview.grid(row=0, column=1, sticky="nsew", padx=12)
 
+    def card_screen_bounds(self):
+        if self.active_workspace != MATCH_CONSOLE or not self.preview.card_box:
+            return None
+        canvas = self.preview.canvas
+        if not canvas.winfo_exists() or not canvas.winfo_viewable():
+            return None
+        left, top, right, bottom = self.preview.card_box
+        return (canvas.winfo_rootx() + left, canvas.winfo_rooty() + top,
+                right - left, bottom - top)
+
     def selected_unit(self):
         return self.match.unit(self.selected_id)
 
@@ -556,6 +479,18 @@ class Companion:
         if self.match.winner is not None or self.match.unit(unit_id).deployed:
             return
 
+        unit = self.match.unit(unit_id)
+        dialog = Dialog(self.root, 'Deploy Unit')
+        ttk.Label(dialog.body, text=f'{unit.label} · Deploy from Reserve', style='Panel.TLabel').pack(padx=12, pady=10)
+        def blocked():
+            if self.edit(lambda draft: draft.blocked_deployment(unit_id), dialog.window):
+                dialog.window.destroy()
+                self.announce('●  Blocked deployment · +1 Energy / TL +2 · remains in Reserve')
+        ttk.Button(dialog.body, text='Deployment and Advance blocked · Energize', command=blocked).pack(padx=12, pady=8)
+        dialog.buttons('Deploy', lambda: (dialog.window.destroy(), self._complete_deployment(unit_id)))
+        dialog.show()
+
+    def _complete_deployment(self, unit_id):
         def refresh():
             if unit_id == self.selected_id:
                 self.refresh_unit_display()
@@ -616,6 +551,15 @@ class Companion:
     def open_attack(self, profile=None, *, parent=None):
         unit = self.selected_unit()
         profiles = self.attack_profiles(unit)
+        pending = self.match.pending_attack
+        if pending:
+            from .status_rules import StatusDiceTray
+            actor = self.match.unit(pending['attacker'])
+            weapon = next(w for w in self.attack_profiles(actor) if w.name == pending['weapon'])
+            StatusDiceTray(parent or self.root, f'{actor.label} / {weapon.name}', pending['count'],
+                          pending['accuracy'], actor.player, app=self, attacker=actor,
+                          target=self.match.attack_target(pending['target']), weapon=weapon, revision=self.revision)
+            return
         if profiles and (profile is None or profile in profiles):
             DicePrompt(parent or self.root, unit=unit, profiles=profiles, selected=profile, app=self)
 

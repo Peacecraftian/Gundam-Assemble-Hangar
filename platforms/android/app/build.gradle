@@ -1,0 +1,87 @@
+plugins {
+    id 'com.android.application' version '8.11.1'
+    id 'com.chaquo.python' version '17.2.0'
+}
+def shared = rootProject.file('../..')
+android {
+    namespace 'app.hangar.prototype'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'app.hangar.prototype'
+        minSdk 24
+        targetSdk 35
+        versionCode 10300
+        versionName '1.3.0'
+        ndk { abiFilters 'x86_64', 'arm64-v8a' }
+    }
+    sourceSets.main.assets.srcDir layout.buildDirectory.dir('generated/hangarAssets')
+}
+chaquopy {
+    defaultConfig {
+        version = '3.13'
+        def localPython = new File(shared, '.venv/Scripts/python.exe')
+        if (localPython.isFile()) buildPython localPython.absolutePath
+    }
+    sourceSets.main {
+        srcDir shared
+        include 'companion/__init__.py', 'companion/catalog.py', 'companion/match.py',
+                'companion/storage.py', 'companion/file_hash.py', 'companion/scenarios.py',
+                'companion/battlefield_stars.py', 'companion/attacks.py', 'tablet.py'
+    }
+}
+def prepareCards = tasks.register('prepareHangarAssets', Sync) {
+    into layout.buildDirectory.dir('generated/hangarAssets')
+    from(shared) { include 'catalog.json', 'scenarios.json', 'tactics.json', 'attacks.json', 'remote_weapons.json' }
+    from(new File(shared, 'Tokens')) { include '*.svg'; into 'map-art' }
+    from(new File(shared, 'Video')) { include 'REACTOR-SURGE.webp', 'SONIC-WAKE.webp', 'GARRISON-DEFEAT.webp', 'GARRISON-RESCUE.webp', 'VICTORY-STANDARD.webp', 'UNIT-DEFEATED.webp', 'Deploy_P1.webp', 'Deploy_P2.webp' }
+    from(new File(shared, 'Tokens/rendered')) {
+        into 'unit-tokens'
+        include 'strength-upgrade.png','speed-upgrade.png','shields-upgrade.png','disarmed-status.png','fractured-status.png','slow-status.png','blue-objective.png','red-objective.png','hp.png','energy.png'
+    }
+    from(new File(shared, 'Dice')) { include 'physics.js' }
+    def cannon = new File(shared, 'tools/node_modules/cannon-es/dist/cannon-es.cjs.js')
+    inputs.file(cannon)
+    doLast {
+        new File(destinationDir, 'cannon.js').withWriter('UTF-8') { writer ->
+            writer.write('const CANNON = (() => { const exports = {};\n')
+            // Cannon's CommonJS build requests the same clock through Node's perf_hooks.
+            writer.write("const require = name => { if (name !== 'perf_hooks') throw Error(name); return {performance: window.performance}; };\n")
+            writer.write(cannon.getText('UTF-8'))
+            writer.write('\nreturn exports; })();\n')
+        }
+    }
+    from(new File(shared, 'tools/node_modules/cannon-es')) { include 'LICENSE'; rename { 'LICENSE-Cannon-es.txt' } }
+    def unitDir = new File(shared, 'authoring/cards/Unit Cards')
+    def catalog = new groovy.json.JsonSlurper().parse(new File(shared, 'catalog.json'))
+    catalog.each { id, card ->
+        def suffix = id.toLowerCase(Locale.ROOT) + '_en.webp'
+        if (card.image == "img_card_front_${suffix}") {
+            from(unitDir) {
+                include "img_card_${suffix}"
+                into 'sortie'
+                rename { "${id}.webp" }
+            }
+        }
+    }
+    from(unitDir) {
+        def systems = new groovy.json.JsonSlurper().parse(new File(shared, 'remote_weapons.json'))
+        include((catalog.values() + systems.values()).collect { it.image })
+    }
+    def tactics = new groovy.json.JsonSlurper().parse(new File(shared, 'tactics.json'))
+    def tacticsDir = new File(shared, 'authoring/cards/Tactics Cards')
+    tactics.keySet().each { id ->
+        def files = fileTree(tacticsDir) {
+            include "img_card_${id.toLowerCase(Locale.ROOT)}_en.webp",
+                    "img_card_front_${id.toLowerCase(Locale.ROOT)}_en.webp"
+        }.files
+        if (files.size() != 1) throw new GradleException("Expected one published image for ${id}")
+        from(files.first()) { into 'tactics'; rename { "${id}.webp" } }
+    }
+    from(new File(shared,'Images')) { include 'gundam-assemble-hangar.png','speaker-grille.png','hangar-chevrons.png','pixel-decal.png'; into 'console' }
+    from(new File(shared,'Images/Navigation')) { include '*.png','LICENSE-*.txt'; into 'console' }
+    from(new File(shared,'Video')) { include 'Freight Lift.webp'; into 'console' }
+    from(shared) { include 'LICENSE', 'NOTICE.md'; into 'licenses' }
+    from(rootProject.file('licenses')) { into 'licenses' }
+    from(new File(shared, 'Fonts')) { include 'ChakraPetch-Bold.ttf', 'OFL-Chakra-Petch.txt', 'SairaStencilOne-Regular.ttf', 'OFL-Saira-Stencil-One.txt' }
+}
+tasks.named('preBuild').configure { dependsOn prepareCards }

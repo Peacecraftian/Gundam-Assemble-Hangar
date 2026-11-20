@@ -1,4 +1,4 @@
-param([string]$Python = "")
+param([string]$Python = "", [string]$OutputDirectory = "")
 
 $ErrorActionPreference = "Stop"
 if (Test-Path -LiteralPath (Join-Path $PSScriptRoot ".ARCHIVED-WORKSPACE")) {
@@ -111,7 +111,7 @@ print(f"Verified {len(units)} Unit Cards, {len(remote_weapons)} Remote Weapon Sy
 
     $projectRoot = (Resolve-Path -LiteralPath $PSScriptRoot).Path
     $env:PYINSTALLER_CONFIG_DIR = Join-Path $projectRoot ".build/pyinstaller-cache"
-    $dist = Join-Path $projectRoot "dist"
+    $dist = if ($OutputDirectory) { [IO.Path]::GetFullPath($OutputDirectory) } else { Join-Path $projectRoot "dist" }
     $name = "Gundam Assemble Hangar"
     $package = Join-Path $dist $name
     $appIcon = Join-Path $projectRoot "Images/gundam-assemble-hangar.ico"

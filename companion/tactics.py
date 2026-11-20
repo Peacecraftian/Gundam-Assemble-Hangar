@@ -34,6 +34,8 @@ def between_poses(start, target, fraction):
 
 class TacticsScreen:
     FAN_COUNT = 8
+    SWIPE_SLOP = 12
+    SWIPE_STEP = 54
     DRAW_SECONDS = .38
     HUD_SECONDS = .30
     HOVER_SECONDS = .18
@@ -46,6 +48,9 @@ class TacticsScreen:
         numbers = tuple(self.cards)
         self.rails = numbers[::2], numbers[1::2]
         self.offsets = [0, 0]
+        self.fan_count = self.FAN_COUNT
+        self.fan_press = None
+        self.fan_dragged = False
         self.slots = {}
         self.fan_items = {}
         self.fan_poses = {}
@@ -71,6 +76,25 @@ class TacticsScreen:
         self.search_font_size = 20
         self.width = self.height = 1
         self.heading_font, self.body_font = families(self.canvas)
+        style = ttk.Style(self.canvas)
+        style.configure('Tactics.Quiet.TButton', font=(self.heading_font, -18, 'bold'), padding=(8, 3), width=0)
+        style.configure('TacticsResult.Quiet.TButton', font=(self.heading_font, -16, 'bold'), padding=(10, 2), anchor='w', width=0)
+        style.configure('Tactics.Sortie.TEntry', padding=(10, 9))
+        self.rail_controls = []
+        self.rail_buttons = []
+        for side in range(2):
+            controls = ttk.Frame(self.canvas, style='Rail.TFrame', padding=3)
+            buttons = []
+            for delta, label in ((-1, '↑'), (1, '↓')):
+                box = ttk.Frame(controls, style='RailFill.TFrame', width=54, height=48)
+                box.pack(side='left', padx=3)
+                box.pack_propagate(False)
+                button = ttk.Button(box, text=label, style='Tactics.Quiet.TButton',
+                                    command=lambda side=side, delta=delta: self.move_fan(side, delta))
+                button.pack(fill='both', expand=True)
+                buttons.append(button)
+            self.rail_buttons.append(buttons)
+            self.rail_controls.append(self.canvas.create_window(0, 0, window=controls, anchor='sw' if side == 0 else 'se'))
 
         self.title = self.canvas.create_text(0, 0, text="TACTICS", fill=INK, tags="hud-copy")
         self.hint = self.canvas.create_text(0, 0, text="SEARCH BY CARD NAME OR NUMBER", fill=MUTED,
@@ -78,25 +102,33 @@ class TacticsScreen:
         self.message = self.canvas.create_text(0, 0, fill=MUTED, justify="center", font=(self.body_font, -15))
         self.query = tk.StringVar(master=self.canvas)
         search = ttk.Frame(self.canvas, style="Rail.TFrame", padding=3)
-        self.entry = ttk.Entry(search, textvariable=self.query, style="Sortie.TEntry", font=(self.body_font, -20))
-        self.entry.pack(side="left", fill="x", expand=True)
-        ttk.Button(search, text="Clear", style="Quiet.TButton", command=self.clear).pack(side="right", padx=(4, 0))
+        self.entry = ttk.Entry(search, textvariable=self.query, style="Tactics.Sortie.TEntry", font=(self.body_font, -20))
+        self.entry.pack(side="left", fill="both", expand=True)
+        from .dialogs import touch_keyboard
+        touch_keyboard(self.entry, "Search Tactics Cards", live=True)
+        clear_box = ttk.Frame(search, style='RailFill.TFrame', width=88, height=48)
+        clear_box.pack(side='right', padx=(4, 0))
+        clear_box.pack_propagate(False)
+        self.clear_button = ttk.Button(clear_box, text='Clear', style='Tactics.Quiet.TButton', command=self.clear)
+        self.clear_button.pack(fill='both', expand=True)
         self.search_window = self.canvas.create_window(0, 0, window=search, anchor="n")
 
-        self.results = tk.Listbox(self.canvas, background=PANEL, foreground=INK, font=(self.body_font, -15),
-                                  selectbackground=AMBER_WELL, selectforeground=AMBER, activestyle="none",
-                                  highlightthickness=1, highlightbackground=BORDER, exportselection=False, borderwidth=0)
-        self.result_window = self.canvas.create_window(0, 0, window=self.results, anchor="n", state="hidden")
-        self.search_trace = self.query.trace_add("write", self.search)
-        self.entry.bind("<Return>", self.choose_match)
-        self.entry.bind("<Down>", self.focus_results)
-        self.results.bind("<Return>", self.choose_match)
-        self.results.bind("<ButtonRelease-1>", self.choose_match)
+        self.results = ttk.Frame(self.canvas, style='Rail.TFrame', padding=3)
+        self.result_buttons = []
+        self.result_window = self.canvas.create_window(0, 0, window=self.results, anchor='n', state='hidden')
+        self.search_trace = self.query.trace_add('write', self.search)
+        self.entry.bind('<Return>', self.choose_match)
+        self.entry.bind('<Down>', self.focus_results)
+        self.results.bind('<Configure>', self.wrap_results)
         self.canvas.bind("<Configure>", self.layout, add="+")
         self.canvas.bind("<MouseWheel>", self.scroll_fan)
         self.canvas.bind("<Motion>", self.hover_fan)
         self.canvas.bind("<Leave>", lambda _event: self.set_hover(None))
-        self.canvas.bind("<Button-1>", self.pick_fan)
+        self.canvas.bind('<ButtonPress-1>', self.press_fan)
+        self.canvas.bind('<B1-Motion>', self.drag_fan)
+        self.canvas.bind('<ButtonRelease-1>', self.release_fan)
+        self.canvas.bind('<FocusOut>', self.cancel_gesture)
+        self.canvas.bind('<Unmap>', self.cancel_gesture)
         self.canvas.bind("<Destroy>", self.cancel, add="+")
 
     def show(self):
@@ -106,7 +138,19 @@ class TacticsScreen:
     def layout(self, event):
         if (event.width, event.height) == (self.width, self.height):
             return
+        self.cancel_gesture()
         self.width, self.height = event.width, event.height
+        card_height = min(260, max(70, round(self.height * .27)))
+        self.fan_count = min(self.FAN_COUNT, max(3, int((self.height - 116 - card_height) / 48) + 1))
+        for side, rail in enumerate(self.rails):
+            self.offsets[side] = min(self.offsets[side], max(0, len(rail) - self.fan_count))
+            self.canvas.coords(self.rail_controls[side], 12 if side == 0 else self.width - 12, self.height - 10)
+        if self.returning and self.selected is not None:
+            side = self.origin[0]
+            index = self.rails[side].index(self.selected)
+            if not self.offsets[side] <= index < self.offsets[side] + self.fan_count:
+                self.offsets[side] = min(index, max(0, len(self.rails[side]) - self.fan_count))
+            self.origin = side, self.offsets[side]
         font_size = min(68, max(32, round(self.height * .083)))
         title_y = max(37, round(self.height * .14))
         search_y = title_y + font_size // 2 + 33
@@ -115,8 +159,8 @@ class TacticsScreen:
         compact_title_y = max(25, compact_font // 2 + 9)
         compact_search_y = compact_title_y + compact_font // 2 + 20
         self.hud_expanded = title_y, font_size, search_y, search_width, 20
-        self.hud_compact = compact_title_y, compact_font, compact_search_y, max(165, round(search_width * .74)), 16
-        self.preview_top = compact_search_y + 58
+        self.hud_compact = compact_title_y, compact_font, compact_search_y, max(300, round(search_width * .82)), 18
+        self.preview_top = compact_search_y + 72
         self.paint_hud()
         self.paint_fans()
         if self.selected is not None:
@@ -148,9 +192,9 @@ class TacticsScreen:
             self.entry.configure(font=(self.body_font, -search_font))
         self.canvas.coords(self.search_window, center, search_y)
         self.canvas.itemconfigure(self.search_window, width=search_width)
-        self.canvas.coords(self.result_window, center, search_y + 44)
+        self.canvas.coords(self.result_window, center, search_y + 62)
         self.canvas.itemconfigure(self.result_window, width=search_width)
-        self.canvas.coords(self.message, center, (search_y + 58 + self.height - 22) / 2)
+        self.canvas.coords(self.message, center, (search_y + 72 + self.height - 22) / 2)
         self.canvas.itemconfigure(self.message, width=search_width)
 
     def set_hud_compact(self, compact):
@@ -192,10 +236,10 @@ class TacticsScreen:
         card_width = round(card_height * .715)
         size = card_width, card_height
         top = 28 + card_height * .47
-        bottom = max(top, self.height - 33 - card_height * .53)
+        bottom = max(top, self.height - 100 - card_height * .53)
         for side, numbers in enumerate(self.rails):
             start = self.offsets[side]
-            visible = numbers[start:start + self.FAN_COUNT]
+            visible = numbers[start:start + self.fan_count]
             for index, number in enumerate(visible):
                 fraction = index / max(1, len(visible) - 1)
                 inset = card_width * .29 + 9 * sin(fraction * pi)
@@ -221,10 +265,11 @@ class TacticsScreen:
                 if placeholder is not None:
                     self.pending.append((number, item, placeholder, size, angle))
             if visible:
-                self.canvas.create_text(12 if side == 0 else self.width - 12, self.height - 11,
-                                        text=f"{start + 1}–{start + len(visible)} / {len(numbers)}  ·  SCROLL",
+                self.canvas.create_text(12 if side == 0 else self.width - 12, self.height - 72,
+                                        text=f"{start + 1}–{start + len(visible)} / {len(numbers)}  ·  SWIPE",
                                         anchor="sw" if side == 0 else "se", fill=MUTED,
                                         font=(self.body_font, -11), tags=("fan", "fan-count"))
+        self.update_rail_buttons()
         if self.pending:
             self.fan_job = self.canvas.after(12, self.load_fan_card)
         self.canvas.tag_raise("preview")
@@ -256,7 +301,7 @@ class TacticsScreen:
         return focused if inside_focus else None
 
     def hover_fan(self, event):
-        if self.animation_job is None:
+        if self.animation_job is None and self.fan_press is None:
             number = self.card_at(event.x, event.y)
             self.set_hover(number if number in self.fan_photos else None)
 
@@ -274,7 +319,7 @@ class TacticsScreen:
             zoomed = round(width * self.HOVER_SCALE), round(height * self.HOVER_SCALE)
             edge_inset = max(zoomed[0] / 2 + 18, min(x, self.width - x) + height * .35)
             center_x = edge_inset if side == 0 else self.width - edge_inset
-            center_y = min(max(y, zoomed[1] / 2 + 12), self.height - zoomed[1] / 2 - 25)
+            center_y = min(max(y, zoomed[1] / 2 + 12), self.height - zoomed[1] / 2 - 100)
             targets[number] = center_x, center_y, zoomed, angle / 3
             for card in self.rails[side]:
                 if card == number or card not in targets:
@@ -324,25 +369,80 @@ class TacticsScreen:
             self.canvas.after_cancel(self.hover_job)
             self.hover_job = None
 
-    def scroll_fan(self, event):
-        edge = min(195, self.width * .22)
-        if edge < event.x < self.width - edge:
+    def edge_side(self, x):
+        edge = min(220, self.width * .22)
+        return None if edge < x < self.width - edge else int(x >= self.width / 2)
+
+    def update_rail_buttons(self):
+        for side, buttons in enumerate(self.rail_buttons):
+            locked = self.returning and self.origin is not None and side == self.origin[0]
+            limit = max(0, len(self.rails[side]) - self.fan_count)
+            for button, enabled in zip(buttons, (self.offsets[side] > 0, self.offsets[side] < limit)):
+                button.state(['!disabled'] if enabled and not locked else ['disabled'])
+
+    def move_fan(self, side, change):
+        if self.returning and self.origin is not None and side == self.origin[0]:
             return
-        side = int(event.x >= self.width / 2)
-        if self.returning and side == self.origin[0]:
-            return "break"
-        limit = max(0, len(self.rails[side]) - self.FAN_COUNT)
-        change = -1 if event.delta > 0 else 1
+        limit = max(0, len(self.rails[side]) - self.fan_count)
         offset = min(limit, max(0, self.offsets[side] + change))
         if offset != self.offsets[side]:
             self.offsets[side] = offset
             self.paint_fans()
-        return "break"
+
+    def scroll_fan(self, event):
+        side = self.edge_side(event.x)
+        if side is not None and event.delta:
+            self.move_fan(side, -1 if event.delta > 0 else 1)
+            return 'break'
+
+    def press_fan(self, event):
+        side = self.edge_side(event.x)
+        number = self.card_at(event.x, event.y)
+        if side is None and number is None:
+            self.cancel_gesture()
+            return
+        if side is None:
+            side = next(index for index, rail in enumerate(self.rails) if number in rail)
+        self.fan_press = (side, event.x, event.y, self.offsets[side], number)
+        self.fan_dragged = False
+        return 'break'
+
+    def drag_fan(self, event):
+        if self.fan_press is None:
+            return
+        side, x, y, offset, number = self.fan_press
+        if max(abs(event.x - x), abs(event.y - y)) >= self.SWIPE_SLOP:
+            self.fan_dragged = True
+        if self.fan_dragged:
+            self.set_hover(None)
+            change = int((y - event.y) / self.SWIPE_STEP)
+            self.move_fan(side, offset + change - self.offsets[side])
+        return 'break'
+
+    def release_fan(self, event):
+        if self.fan_press is None:
+            return
+        self.drag_fan(event)
+        number = self.fan_press[4]
+        tapped = not self.fan_dragged
+        self.cancel_gesture()
+        if tapped and number is not None:
+            self.pick(number)
+        return 'break'
+
+    def cancel_gesture(self, _event=None):
+        self.fan_press = None
+        self.fan_dragged = False
+
+    def wrap_results(self, event):
+        ttk.Style(self.canvas).configure('TacticsResult.Quiet.TButton', wraplength=max(100, event.width - 30))
 
     def search(self, *_args):
         query = search_key(self.query.get())
         self.matches = []
-        self.results.delete(0, "end")
+        for child in self.results.winfo_children():
+            child.destroy()
+        self.result_buttons.clear()
         self.canvas.itemconfigure(self.result_window, state="hidden")
         if not query:
             self.set_selected(None)
@@ -362,23 +462,34 @@ class TacticsScreen:
             self.set_selected(exact[0])
             return
         self.matches = (exact + [number for _, _, number in sorted(partial)])[:6]
-        for number in self.matches:
-            self.results.insert("end", f"{self.cards[number].name}  ·  {number}")
+        for index, number in enumerate(self.matches):
+            box = ttk.Frame(self.results, style='RailFill.TFrame', height=48, width=1)
+            box.pack(fill='x', pady=2)
+            box.pack_propagate(False)
+            button = ttk.Button(box, text=f'{self.cards[number].name}  ·  {number}',
+                style='TacticsResult.Quiet.TButton', command=lambda number=number: self.pick(number))
+            button.pack(fill='both', expand=True)
+            button.bind('<Down>', lambda _event, index=index: self.focus_result(index + 1))
+            button.bind('<Up>', lambda _event, index=index: self.focus_result(index - 1))
+            button.bind('<Return>', lambda _event, number=number: self.pick(number))
+            self.result_buttons.append(button)
         if self.matches:
-            self.results.configure(height=len(self.matches))
-            self.results.selection_set(0)
             self.canvas.itemconfigure(self.result_window, state="normal")
         self.update_message()
 
     def focus_results(self, _event):
         if self.matches:
-            self.results.focus_set()
+            self.result_buttons[0].focus_set()
             return "break"
+
+    def focus_result(self, index):
+        if self.result_buttons:
+            self.result_buttons[index % len(self.result_buttons)].focus_set()
+        return 'break'
 
     def choose_match(self, _event):
         if self.matches:
-            index = self.results.curselection()
-            self.pick(self.matches[index[0] if index else 0])
+            self.pick(self.matches[0])
         return "break"
 
     def pick(self, number):
@@ -417,6 +528,7 @@ class TacticsScreen:
         elif self.returning:
             self.stop_animation()
             self.returning = False
+            self.update_rail_buttons()
             self.animate(monotonic(), self.slots[number], self.preview_fraction, 1, self.preview_pose)
         self.update_message()
 
@@ -433,8 +545,8 @@ class TacticsScreen:
             if number in rail:
                 if number not in self.slots:
                     index = rail.index(number)
-                    self.offsets[side] = min(max(0, index - self.FAN_COUNT // 2),
-                                             max(0, len(rail) - self.FAN_COUNT))
+                    self.offsets[side] = min(max(0, index - self.fan_count // 2),
+                                             max(0, len(rail) - self.fan_count))
                 self.origin = side, self.offsets[side]
                 break
         self.paint_fans()
@@ -449,12 +561,18 @@ class TacticsScreen:
             return
         self.stop_animation()
         side, offset = self.origin
+        index = self.rails[side].index(self.selected)
+        offset = min(max(0, offset), max(0, len(self.rails[side]) - self.fan_count))
+        if not offset <= index < offset + self.fan_count:
+            offset = min(index, max(0, len(self.rails[side]) - self.fan_count))
+        self.origin = side, offset
         moved = self.offsets[side] != offset
         self.offsets[side] = offset
         if self.preview is None or self.preview_fraction == 0:
             self.finish_return()
             return
         self.returning = True
+        self.update_rail_buttons()
         if moved:
             self.paint_fans()
         else:
@@ -529,7 +647,7 @@ class TacticsScreen:
         elif self.query.get().strip() and not self.matches:
             text = "No Tactics Cards match that search."
         else:
-            text = "Search for a Tactics Card or select one from either edge."
+            text = "Swipe either edge to browse, or tap a card. Search by name or number."
         self.canvas.itemconfigure(self.message, text=text)
 
     def stop_animation(self):
@@ -538,6 +656,9 @@ class TacticsScreen:
             self.animation_job = None
 
     def cancel(self, _event):
+        if _event.widget is not self.canvas:
+            return
+        self.cancel_gesture()
         self.query.trace_remove("write", self.search_trace)
         self.stop_animation()
         self.stop_hover_animation()

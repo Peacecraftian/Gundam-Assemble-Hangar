@@ -158,11 +158,18 @@ async function main() {
   const executablePath = process.env.CARD_RENDER_CHROME;
   // Serve only the requested source files. No checkout browsing or external SVG requests.
   const allowed = new Map();
+  const originals = new Map();
+  const units = kind === 'unit' ? JSON.parse(await readFile(join(project, 'catalog.json'), 'utf8')) : {};
   for (const number of numbers) {
     const suffix = `${number.toLowerCase()}_en.webp`;
     const sources = files.filter(file => [`img_card_${suffix}`, `img_card_front_${suffix}`].includes(file.toLowerCase()));
-    if (sources.length !== 1) throw new Error(`${number}: expected one published English WEBP`);
-    for (const name of [sources[0], `SVG/${number}.svg`]) {
+    const printed = units[number]?.image;
+    const paired = printed === `img_card_front_${suffix}` &&
+      sources.includes(printed) && sources.includes(`img_card_${suffix}`);
+    if (!paired && sources.length !== 1) throw new Error(`${number}: expected one published English WEBP`);
+    const original = paired ? printed : sources[0];
+    originals.set(number, original);
+    for (const name of [original, `SVG/${number}.svg`]) {
       const path = await realpath(join(root, name));
       const realRoot = await realpath(root);
       if (!path.startsWith(realRoot + require('node:path').sep)) throw new Error('Source may not escape card directory');
@@ -194,11 +201,8 @@ async function main() {
       return url.startsWith(baseURL + '/') || url.startsWith('data:') ? route.continue() : route.abort();
     });
     for (const number of numbers) {
-      const suffix = `${number.toLowerCase()}_en.webp`;
-      const sources = files.filter(file => [`img_card_${suffix}`, `img_card_front_${suffix}`].includes(file.toLowerCase()));
-      if (sources.length !== 1) throw new Error(`${number}: expected one published English WEBP`);
       try {
-        await render(page, output, kind, number, sources[0], baseURL);
+        await render(page, output, kind, number, originals.get(number), baseURL);
       } catch (error) {
         throw new Error(`${number}: ${error.message}`);
       }

@@ -1,0 +1,15 @@
+<resources>
+    <style name="Hangar" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:colorAccent">#FFB762</item>
+        <item name="android:colorBackground">#151A1C</item>
+        <item name="android:windowBackground">#151A1C</item>
+        <item name="android:textColorPrimary">#F2EDE0</item>
+        <item name="android:textColorSecondary">#B4BCB5</item>
+        <item name="android:alertDialogTheme">@style/HangarDialog</item>
+    </style>
+    <style name="HangarDialog" parent="@android:style/Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">#FFB762</item>
+        <item name="android:colorBackground">#242B2D</item>
+        <item name="android:textColorPrimary">#F2EDE0</item>
+    </style>
+</resources>

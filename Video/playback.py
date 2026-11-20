@@ -50,8 +50,9 @@ def allow_click_through(window):
 class DeploymentOverlay:
     """Play match overlays and animate the active Hangar door."""
 
-    def __init__(self, root):
+    def __init__(self, root, card_screen_bounds):
         self.root = root
+        self.card_screen_bounds = card_screen_bounds
         self.window = None
         self.shade = None
         self.image = None
@@ -106,6 +107,8 @@ class DeploymentOverlay:
             canvas.pack(fill="both", expand=True)
             self.bounds = None
             self.effect_frame(canvas, monotonic(), draw, duration, args)
+            if self.window is None:
+                return
             self.window.update_idletasks()
             allow_click_through(self.window)
             self.window.deiconify()
@@ -115,13 +118,14 @@ class DeploymentOverlay:
     def effect_frame(self, canvas, started, draw, duration, args):
         self.job = None
         t = (monotonic() - started) / duration
-        if t >= 1 or not self.root.winfo_viewable():
+        card = self.card_screen_bounds()
+        if t >= 1 or not card or not self.root.winfo_viewable():
             self.stop()
             return
-        width = min(790, self.root.winfo_width())
-        height = min(370, self.root.winfo_height() // 2)
-        x = self.root.winfo_rootx() + (self.root.winfo_width() - width) // 2
-        y = self.root.winfo_rooty() + self.root.winfo_height() - height
+        left, top, card_width, card_height = card
+        width, height = min(790, card_width), min(370, card_height)
+        x = left + (card_width - width) // 2
+        y = top + (card_height - height) // 2
         bounds = f"{width}x{height}+{x}+{y}"
         if bounds != self.bounds:
             self.window.geometry(bounds)

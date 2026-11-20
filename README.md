@@ -1,95 +1,92 @@
 # Gundam Assemble Hangar
 
-**Your shared command console for the Gundam Assemble table.** Build squads, prepare the battlefield, track both players’ units, and resolve attack rolls on one screen. An offline Windows companion for playing with physical miniatures and cards—at a laptop or on a fullscreen tabletop display.
+An unofficial companion for playing **Gundam Assemble with physical miniatures**. Assemble squads, set up the battlefield, track both players' units and Victory Points, and roll attacks together on a laptop, touch PC, or landscape Android tablet. Cards, scenarios, dice, and saves work offline.
 
-**[Download the Windows ZIP](https://github.com/Peacecraftian/Gundam-Assemble-Hangar/releases/latest)** · [Get started](#get-started) · [Mission Sortie](#mission-sortie) · [Battlefield](#battlefield) · [Match Console](#match-console) · [Tactics](#tactics)
+**[Download v1.3.0](https://github.com/Peacecraftian/Gundam-Assemble-Hangar/releases/tag/v1.3.0)** · [Windows](#windows) · [Android](#android) · [Playing a match](#playing-a-match) · [Build from source](docs/DEVELOPMENT.md)
 
-![Match Console with both VP totals, portrait Timeline trackers, Gundam Aerial’s state, orange Deploy RWS button, and evenly sized footer controls](docs/screenshots/match-console.png)
+![Windows Match Console with mirrored touch action buttons, portrait Timeline tokens, HP and Energy bars, and central Unit Card controls](docs/screenshots/match-console.png)
 
-## Get started
+## Install and play
 
-1. **Extract and launch.** Download the Windows x64 ZIP, extract it, and open **Gundam Assemble Hangar.exe**. Keep the EXE and its `_internal` folder together. No Python or Node installation is needed.
-2. **Assemble your squads.** Open **Mission Sortie**, name the players, choose a scenario if desired, and add published Unit Cards. Start the match, then use **Battlefield** to arrange the physical board.
-3. **Deploy and play.** Click **Deploy** in a unit’s Hangar when its miniature enters play. Use **Match Console** for bookkeeping and **Tactics** to look up cards. Either header screw toggles fullscreen; **Esc** exits it on the current monitor.
+### Windows
 
-Hangar resumes your last match and retains the last 20 saved edits for **Undo**, even after restarting. Saves live at `%LOCALAPPDATA%\Gundam Assemble Companion\match.sqlite3`. Starting a replacement match requires confirmation.
+Download **Gundam-Assemble-Hangar-v1.3.0-Windows-x64.zip**, choose **Extract All**, and open **Gundam-Station/Launcher/Hangar.Launcher.exe**. Tap **Enter Hangar** to launch fullscreen. The ZIP includes the terminal launcher, game, required runtimes, and three local rules PDFs.
 
-## Mission Sortie
+Either header screw toggles Hangar fullscreen. **Esc** restores window mode. Close Hangar to return to the terminal, or use **Maintenance → Return to desktop** to leave the launcher. The included README explains optional startup at Windows sign-in.
 
-![Mission Sortie with the Unit Catalog, full card inspection, and two three-unit squads linked to Operation Azure Fang](docs/screenshots/mission-sortie.png)
+Station saves live in **Gundam-Station/Data**. When updating, close both programs, extract the new package into a new folder, and copy your existing **Data** folder into it. Keep the whole station folder together.
 
-Search the catalog by name or card number. Drag a card into either squad at the amber insertion line, or use **Add To Player 1 / 2**. Drag squad rows to reorder them; slot numbers and Hangar order follow your lineup. Remove a row with **−** or drag it outside the list. Duplicate cards are allowed only for **Mass Produced** units.
+### Android
 
-Choose a bundled or custom scenario, or **No scenario** to track a match independently. Set the Phase count, then click **Start Match**. Units begin in Reserve at their printed Timeline positions.
+Download **Gundam-Assemble-Hangar-v1.3.0-Android.apk** on your tablet and open it. If Android asks, allow installation from the browser or file manager you used. The APK supports Android 7.0 or later on ARM64 and x86-64 devices and opens in landscape.
 
-## Battlefield
+Android has Mission Sortie, Battlefield, Match Console, Service Bay, and Tactics browsing. Saves belong to that installation. Keep the app installed to retain your match and custom scenarios when updating. Windows and Android maintain separate local matches.
 
-![Operation Azure Fang in the Jungle palette, with numbered objectives, Water overlays, and rules for the selected hex](docs/screenshots/battlefield.png)
+This is the first publicly packaged Android build. It has been checked on an Android 15 landscape tablet emulator. Physical-device feedback is welcome. Earlier development APKs use a different signing key, so installing this release over one may require removing the development app and its local data.
 
-Set up **Operation Sleeping Leviathan**, **Operation Azure Fang**, **Operation Lockdown**, or a custom scenario using the mission briefing and the 203-hex board. Terrain colors show elevation; Special Terrain decals and gameplay tokens layer above it. Select a hex to inspect its contents and associated Special Terrain rules. The scenario chosen in Mission Sortie follows the match when you resume it.
+![Android Match Console on the landscape tablet](docs/screenshots/android-match-console.png)
 
-Preview five environments—**Desert, Jungle, Space, Urban, and Underwater**—with Ground Level, Height 1, and Height 2 colors. Each scenario loads its saved palette.
+## Playing a match
 
-### Create and share scenarios
+1. In **Mission Sortie**, enter player names, choose an optional scenario, and assemble both squads from published cards. Full-art variants appear during selection. Drag units into the Windows squads and reorder their slots. Duplicate cards are permitted for Mass Produced units.
+2. Open **Battlefield** for the selected scenario's map, mission briefing, terrain and token placements.
+3. Return to **Match Console** and deploy units as their activations arrive. Both VP totals, Timeline lanes and Hangars stay visible. Drag Timeline tokens between rounds, use **Other Phases** for later activations, and open **Service Bay** for exact scheduling and stack order.
+4. Use the action buttons beside the acting player's VP total. Tap the VP number for a manual adjustment. **VP History** shows recorded awards, and **Finish Match** handles final totals and the last-to-act tiebreaker.
 
-- Choose **New Scenario** for a blank board, or **Edit Mode** to revise a scenario’s name, location, overview, objectives, and layout.
-- Click-and-drag an elevation brush to paint terrain. Right-drag resets it to Ground Level. **Water, Impassable Terrain, Debris Fields, and Minovsky Particles** use a separate overlay layer; right-drag with one of these brushes erases that layer.
-- Place gameplay tokens with individual clicks; right-click with a token brush to remove them. Objective flags number themselves 1–4 in placement order. **Undo / Redo** treats each brush stroke or token edit as one action.
-- **Save** keeps your custom scenario and palette locally. Editing a bundled scenario creates a custom copy; only custom scenarios can be deleted. **Export / Import** shares the briefing, palette, terrain, and tokens in one JSON file.
+The app autosaves edits and keeps the last 20 Undo entries across restarts. Starting a replacement match asks for confirmation.
 
-## Match Console
+![Mission Sortie with full-art unit inspection and both squads](docs/screenshots/mission-sortie.png)
 
-### Timeline and unit state
+## Built for touch at the table
 
-Use the **Round** arrows to advance or rewind; crossing Round 10 advances the Phase. **Jump** selects a Phase and Round directly. Drag portrait trackers within a player’s lane to move units or reorder a stack. **Other Phases** lists units outside the current Phase.
+- Larger, player-colored action buttons and portrait target selectors make units easier to identify.
+- HP and Energy bars appear in the Hangars and highlighted card. Use the card header's **− / +** controls for adjustments.
+- Tap Strength, Speed, and Shield upgrade icons to increase their counts, cycling back to zero after eight. Status icons toggle Disarm, Fracture, and Slow.
+- **Service Bay** provides larger upgrade controls, individual Shield states, and tap choices for Phase, round and stack position.
+- Windows text fields open an on-screen keyboard for player names, searches and notes. Android uses its system keyboard.
+- Tactics supports touch scrolling and card inspection. On Windows, double-tap the enlarged card artwork to close it.
 
-Click a Hangar card or tracker to inspect the unit in the center:
+![Service Bay with Shield tokens, large upgrade controls and Timeline selectors](docs/screenshots/service-bay.png)
 
-- **HP, Energy, Speed, Strength:** left-click adds one; right-click subtracts one.
-- **Statuses:** left-click applies, right-click clears. Clicking a status badge in the Hangar also clears it.
-- **Shields:** left-click reactivates inactive Shields, or adds one if none are inactive and a slot is free. Right-click spends an active Shield.
+## Attacks and actions
 
-Double-click a Hangar card or tracker, or open **Service Bay**, for detailed edits, individual Shield slots, Timeline placement, notes, and **Return To Reserve**. Confirm with **Save Unit**. **View Card** opens the full card.
+Tap a weapon's stat strip or **Attack**, choose an enemy unit or Garrison, and enter applicable Strength and Accuracy modifiers. **Declare & Roll** pays the printed weapon TL before rolling. Select individual dice for **Reroll Selected**, then review and **Apply Damage**.
 
-### Attack rolls and selective rerolls
+The damage preview accounts for active Shields and Fracture. Resolve Disarm after other After Attack Roll abilities. Wing Zero's Zero System recognizes natural 7–10 as criticals, and its Twin Buster Rifle adds the appropriate critical damage bonus. Defeated units award VP, return to Reserve, advance 2 TL, recover HP, and clear statuses while keeping Energy and Upgrades.
 
-![Attack results showing individual D10s selected for reroll, hit totals, and a Shield-aware damage preview](docs/screenshots/attack-dice.png)
-
-1. Select a deployed unit and click a weapon’s stat strip, or **Attack**. Choose a deployed enemy from the portrait lineup. Strength Upgrades are prefilled; enter any other Strength and Accuracy modifiers.
-2. Roll the D10 pool. For abilities that allow rerolls, click the relevant results and **Reroll Selected**. Unselected dice stay intact, and hit/critical totals update.
-3. Enter any **Damage Modifier**, review the preview, then **Apply Damage**. Active Shields absorb damage and deactivate before HP is reduced. Lethal damage triggers the Unit Defeat workflow below, including its animation. The entire resolution is one **Undo** action.
-
-HP stays unchanged until **Apply Damage**; closing the tray discards an unapplied roll. Resolve critical effects, Fracture, other abilities, range, line of sight, and the attacker’s Timeline cost at the table. Enter net damage adjustments before Shields. **Roll D10s** in the footer provides free rolls of up to 60 dice without applying damage.
-
-### Actions and scoring
-
-Use the buttons **under the acting player’s VP total**. Dash, Energize, and Garrison actions list that player’s deployed units and preselect the highlighted unit when eligible. Unit Defeat lists deployed opponents and their Remote Weapon Systems. Portraits and squad numbers distinguish copies.
+Closing the tray preserves the declared attack and settled dice. Reopen **Attack** to resume. One **Undo** reverses the declaration and its results. Making a different match edit while the tray is closed ends the suspended attack with its TL paid.
 
 | Action | What Hangar records |
 | --- | --- |
-| **Dash** | Advances the unit two Timeline spaces; move the miniature at the table. |
-| **Energize** | Adds 1 Energy and advances the unit two Timeline spaces. |
-| **Garrison Defeat / Rescue** | Awards the acting player 2 VP and advances the unit two Timeline spaces. |
-| **Unit Defeat** | Awards printed VP to the opponent, returns the target to Reserve, advances it two Timeline spaces, restores HP, and clears statuses. Energy and Upgrades remain. |
-| **Scenario Goal** | Records the VP award you enter for the scenario. |
+| Dash | Advances the acting unit 2 TL. |
+| Energize | Grants 1 Energy and advances the unit 2 TL. |
+| Garrison Rescue | Awards 2 VP and advances the rescuer 2 TL. |
+| Garrison attack | Uses the weapon's TL and defeats the 1-HP target for 2 VP if damage gets through. |
+| Garrison Defeat shortcut | Records a tabletop result. Enter only unpaid TL, defaulting to zero. |
+| Scenario Goal | Records the VP award you enter. |
+| Blocked deployment | Grants 1 Energy and advances 2 TL while staying in Reserve, when both deployment and a legal Advance are impossible. |
 
-Each action is one saved **Undo** step. Click a VP total for a manual adjustment. **VP History** lists awards and reasons; **Finish Match** asks who acted last when scores tie.
+![Garrison Defeat animation above the highlighted Unit Card](docs/screenshots/garrison-defeat.png)
 
-![Garrison Defeat’s pixel explosion and Player 1 +2 VP placard over the Match Console](docs/screenshots/garrison-defeat.png)
+Players judge range, line of sight, terrain, movement and other card effects at the table. Area attacks currently resolve against one target per attack dialog. Extra attacks and altered TL costs require manual bookkeeping. **Roll D10s** provides a free dice tray. Remote Weapon Systems have their own deployment, HP and defeat controls.
 
-Garrison Defeat and Rescue celebrate recorded actions with pixel effects; Energize plays **Reactor Surge**, Dash fires a blue Vernier jet, and positive Scenario Goal awards raise a victory flag with fireworks. Deployment and Unit Defeat also have their own cinematics.
+![Detailed Unit Card with Deploy RWS, Attack and Close controls](docs/screenshots/remote-weapons.png)
 
-### Remote Weapon Systems
+## Battlefield and custom scenarios
 
-![Gundam Aerial’s full card viewer with BIT Stave in supply and matching Deploy RWS, Attack, and Close buttons](docs/screenshots/remote-weapons.png)
+The bundled scenarios are **Operation Sleeping Leviathan**, **Operation Azure Fang**, **Operation Lockdown**, and **Operation Gravedigger**. The selected scenario reopens with your match.
 
-Click an RWS icon on its parent’s card to inspect the system. Use **Deploy RWS** below the central card or in the full **View Card** window when its deployed parent launches it. Track its HP separately; reaching zero returns it to supply and awards its printed VP. Systems can also be selected in **Unit Defeat**. To record a parent and system defeated together, select the parent there and check **Also Defeated**.
+![Battlefield with the mission briefing, terrain legends and token placements](docs/screenshots/battlefield.png)
+
+Choose **New Scenario** or **Edit Mode** to paint elevation and Special Terrain, place tokens, and write the briefing. Terrain brushes support strokes with Undo and Redo. Water, Impassable Terrain, Debris Fields and Minovsky Particles sit above elevation, with their rules available when inspecting a hex. Objective flags number themselves in placement order.
+
+Five palettes include Desert, Jungle, Urban, Underwater and Space, with sparse stars on Space ground tiles. Save custom scenarios locally or use **Import / Export** to share their JSON files. Editing an official scenario creates a custom copy.
 
 ## Tactics
 
-![Tactics browser with Bit Assault enlarged between two card fans](docs/screenshots/tactics.png)
+Search published Tactics Cards by name or card number and open a readable full-card view. Use physical decks and resolve card effects at the table.
 
-Search by printed name or card number, then click a result or press **Enter** to inspect it. Scroll the side fans, hover to spread cards, and click to enlarge one. **Clear** or **Esc** returns it to the fan. Resolve the card’s effects at the table and record any resulting state changes in Match Console.
+![Tactics browser and enlarged published card](docs/screenshots/tactics.png)
 
 ## About the project
 

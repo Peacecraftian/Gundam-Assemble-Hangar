@@ -11,10 +11,11 @@ from uuid import uuid4
 from PIL import Image, ImageDraw
 
 from .artwork import map_token_art, objective_art, published_token_art, scenario_token_art, token_puff_art
+from .battlefield_stars import draw_ground_stars
 from .dialogs import overflow_scrollbar
 from .scenarios import (
-    DEFAULT_PALETTE, HEX_COLUMN_LENGTHS, HEX_KEYS, MISSION_FIELDS, NEW_SCENARIO, PALETTES, SPECIAL_TERRAIN,
-    TERRAIN, TOKENS, read_scenario_file, scenario_choices, set_scenario_token, write_scenario_file,
+    DEFAULT_PALETTE, HEX_COLUMN_LENGTHS, HEX_KEYS, MISSION_FIELDS, NEW_SCENARIO, NUMBERED_TOKENS, PALETTES, SPECIAL_TERRAIN,
+    SPECIAL_TERRAIN_RULES, TERRAIN, TOKENS, read_scenario_file, scenario_choices, set_scenario_token, write_scenario_file,
 )
 from .storage import LOCAL_SCENARIO_PREFIX, UNDO_LIMIT, SaveConflict
 from .theme import FooterButton, AMBER, BORDER, CELL, DISPLAY_FAMILY, FOCUS, INK, PANEL, SIDES, app_cursor, panel_heading
@@ -24,16 +25,6 @@ SCENARIO_FILE_TYPES = (("Scenario JSON", "*.json"),)
 HEX_DIVIDER = "#030710"
 HEX_SELECTION = "#FFFFE4"
 PLACEMENT_SCALES = (.84, .67, .85, 1.17, 1.07, .97, 1)
-SPECIAL_TERRAIN_RULES = {
-    "water": "Move actions starting in water lose 1 hex.\n"
-             "Attacks lose 1 Accuracy for the attacker in water and 1 for the target in water (-2 if both).",
-    "impassable_terrain": "Only units with Hover can move through these hexes. "
-                          "Every unit must end its movement elsewhere.",
-    "debris_fields": "Move actions starting in a debris field lose 1 hex.\n"
-                     "Attacks lose 1 Accuracy for the attacker in debris and 1 for the target in debris (-2 if both).",
-    "minovsky_particles": "For non-adjacent attacks, apply -2 Accuracy if either the attacker or target is inside "
-                          "Minovsky Particles. Apply the penalty once when both are inside.",
-}
 
 
 def terrain_swatch(color):
@@ -236,6 +227,8 @@ class BattlefieldScreen:
                 scrollbar.grid(row=row + 1, column=1, sticky="ns")
                 field.configure(yscrollcommand=scrollbar.set)
                 editor.rowconfigure(row + 1, weight=1)
+            from .dialogs import touch_keyboard
+            touch_keyboard(field, label, multiline=isinstance(field, tk.Text))
             self.fields[key] = field
         return editor
 
@@ -751,6 +744,7 @@ class BattlefieldScreen:
             y = oy + (row - 1 + (.5 if col % 2 == 0 else 0)) * step
             points = [value for dx, dy in vertices for value in (x + dx, y + dy)]
             canvas.create_polygon(points, fill=colors[cell["terrain"]], tags=(key, "hex", "battlefield"))
+            draw_ground_stars(canvas, self.palette_id, cell["terrain"], key, x, y, radius)
             decal = self.decal_photos.get(cell.get("special_terrain"))
             if decal is not None:
                 canvas.create_image(x, y, image=decal, tags=(key, "hex-decal", "battlefield"))
@@ -763,7 +757,7 @@ class BattlefieldScreen:
             if cell.get("token"):
                 canvas.create_image(x, y, image=self.map_photos[cell["token"]],
                                     tags=(key, "hex-token", "battlefield"))
-                if cell["token"] == "objective":
+                if cell["token"] in NUMBERED_TOKENS:
                     self.draw_objective_number(key, cell["objective_number"], x, y, icon_size)
         # Decals cover elevation fills. Grid lines, selection and gameplay tokens sit above them.
         for layer in ("hex-decal", "hex-divider", "hex-selection", "hex-token", "hex-objective-number"):
@@ -771,7 +765,7 @@ class BattlefieldScreen:
         cell = self.cells[self.selected]
         self.show_terrain_rules(cell.get("special_terrain"))
         token = TOKENS[cell["token"]][0] if cell.get("token") else "No token"
-        if cell.get("token") == "objective":
+        if cell.get("token") in NUMBERED_TOKENS:
             token += f" {cell['objective_number']}"
         self.detail_photo = (self.app.photos.get(scenario_token_art, TOKENS[cell["token"]][1], 42)
                              if cell.get("token") else None)

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "terminalName": "HANGAR TERMINAL · DEVELOPMENT",
+  "fullscreen": true,
+  "returnToLauncher": true,
+  "primary": {
+    "label": "Gundam Assemble Hangar",
+    "path": "../dist/Gundam Assemble Hangar/Gundam Assemble Hangar.exe",
+    "workingDirectory": "../dist/Gundam Assemble Hangar",
+    "arguments": ["--fullscreen", "--save-path", "../../.build/launcher-smoke.sqlite3"]
+  },
+  "references": [
+    { "label": "Core Rulebook", "description": "Official English rules · local PDF", "kind": "document", "path": "../Rules/GA_Official Core Rulebook_en_1106.pdf" },
+    { "label": "Play Guide", "description": "Quick reference · local PDF", "kind": "document", "path": "../Rules/Gundam_Assemble_Website_Play_Guide.pdf" },
+    { "label": "Demo Scenario", "description": "Introductory mission · local PDF", "kind": "document", "path": "../Rules/Gundam-Assemble-Demo-Scenario.pdf" }
+  ],
+  "tools": [
+    { "label": "Sound", "description": "Volume and audio output", "kind": "settings", "path": "ms-settings:sound" },
+    { "label": "Display", "description": "Scale, orientation and display", "kind": "settings", "path": "ms-settings:display" }
+  ]
+}

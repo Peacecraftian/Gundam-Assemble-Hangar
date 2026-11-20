@@ -20,7 +20,7 @@ async function main() {
   try {
     const renders = new Map();
     const batches = specialTerrain ? [[names, 256, 256, 1]] : [[names, 360, 308, 2]];
-    if (battlefield) batches.push([["objective"], 360, 308, 2]);
+    if (battlefield) batches.push([["objective", "special-objective"], 360, 308, 2]);
     for (const [assets, width, height, deviceScaleFactor] of batches) {
       const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor, javaScriptEnabled: false });
       await page.route("**/*", route => route.abort());

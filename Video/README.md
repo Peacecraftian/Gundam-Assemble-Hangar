@@ -16,7 +16,7 @@ This folder holds the match cinematics, procedural effects, and playback code.
 | `goal_effect.py` | Lazy Victory Standard loading and actual player/VP placard |
 | `playback.py` | Overlay playback, Hangar door transitions, dimming, and timing |
 
-Garrison animations are drawn at runtime so particles, player colors, and VP labels remain dynamic. They do not have separate video clips. Small interactive motions (dragging, hover, dice physics, and Battlefield token placement) belong to their respective UI controls.
+Windows draws the Garrison animations at runtime. Android plays offline copies of the same explosion and rescue particles from `GARRISON-DEFEAT.webp` and `GARRISON-RESCUE.webp`. Regenerate both clips with `python -m tools.prepare_garrison_clips` after updating the artwork. Small interactive motions (dragging, hover, dice physics, and Battlefield token placement) belong to their respective UI controls.
 
 `ANIMATION_FILES` in `__init__.py` explicitly selects the media shipped in the portable build. Add approved runtime clips there, then run `python -m tools.prepare_assets` and `build.ps1`. Python modules are bundled by PyInstaller through normal imports. Source MOV files are local-only and excluded from the portable build; experiments and exported studies stay in ignored `.local-authoring/`.
 

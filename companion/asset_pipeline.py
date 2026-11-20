@@ -15,13 +15,13 @@ from .attacks import load_attacks
 from .card_display import (build_display_cache, display_cache_path, read_manifest,
                            source_digest, write_manifest)
 from .catalog import (TACTICS_CARDS, UNIT_CARDS, card_source_directory, load_catalog,
-                      load_remote_weapons, load_tactics, published_number, unique_keys)
+                      load_remote_weapons, load_tactics, published_number, sortie_filename, unique_keys)
 from .dice import DICE_FILES
 from .scenarios import SPECIAL_TERRAIN, load_scenarios
 
 CARD_SETS = (UNIT_CARDS, TACTICS_CARDS)
 BATTLEFIELD_ART = {artwork: (256, 256) for _, artwork in SPECIAL_TERRAIN.values()}
-BATTLEFIELD_ART['objective'] = (720, 616)
+BATTLEFIELD_ART.update({name: (720, 616) for name in ('objective', 'special-objective')})
 BATTLEFIELD_RENDER_DIR = Path('.build/battlefield-renders')
 BATTLEFIELD_RENDERER = Path('tools/render_battlefield_tokens.cjs')
 STATIC_FILES = (
@@ -61,6 +61,7 @@ def discover_cards(root):
     for folder, metadata in ((UNIT_CARDS, units | remote), (TACTICS_CARDS, tactics)):
         source = card_source_directory(root, folder)
         originals = {}
+        sortie_fronts = {}
         expected_letter = 'U' if folder == UNIT_CARDS else 'T'
         for path in sorted(source.glob('*')):
             if path.suffix.lower() != '.webp':
@@ -68,11 +69,15 @@ def discover_cards(root):
             number = published_number(path.name)
             if not number or not number.split('-')[-1].startswith(expected_letter):
                 raise ValueError(f'Unrecognized card source: {path.relative_to(root)}')
+            if folder == UNIT_CARDS and number in units and isinstance(units[number], dict):
+                if path.name == sortie_filename(units[number].get('image')):
+                    sortie_fronts[number] = path
+                    continue
             if number in originals:
                 raise ValueError(f'Duplicate published image for {number}')
             originals[number] = path
         masters = {path.stem: path for path in (source / 'SVG').glob('*.svg')}
-        for path in (*originals.values(), *masters.values()):
+        for path in (*originals.values(), *masters.values(), *sortie_fronts.values()):
             if not path.resolve().is_relative_to(root.resolve()):
                 raise ValueError(f'Authoring input escapes checkout: {path.relative_to(root)}')
         for number in sorted(originals.keys() | metadata.keys() | masters.keys()):
@@ -88,6 +93,7 @@ def discover_cards(root):
                 if not isinstance(metadata[number], dict) or metadata[number].get('image') != originals[number].name:
                     missing.append('metadata image must match the unique original filename')
             records.append({'folder': folder, 'number': number, 'missing': missing,
+                            'sortie_front': sortie_fronts[number].relative_to(root).as_posix() if number in sortie_fronts else None,
                             'original': originals[number].relative_to(root).as_posix() if number in originals else None,
                             'master': masters[number].relative_to(root).as_posix() if number in masters else None})
     return records
@@ -154,6 +160,11 @@ def publish_assets(root, cards, *, battlefield_art=False):
                           for name in BATTLEFIELD_ART})
         for card in cards:
             paths[f"{card['folder']}/{Path(card['original']).name}"] = root / card['original']
+            if card['sortie_front']:
+                front = root / card['sortie_front']
+                with Image.open(front) as image:
+                    image.load()
+                paths[f"{card['folder']}/{front.name}"] = front
         for folder in CARD_SETS:
             cache = display_cache_path(root, folder)
             paths[f'{folder}/Display/sources.json'] = cache / 'sources.json'

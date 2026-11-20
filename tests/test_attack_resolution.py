@@ -51,6 +51,15 @@ class AttackResolutionTests(unittest.TestCase):
         self.assertFalse(self.match.resolve_attack(1, 3, 2, modifier=-5))
         self.assertEqual(self.match.to_json(), before)
 
+    def test_paid_miss_wraps_phase_and_joins_allied_stack(self):
+        self.match.move_token(1, 1, 9)
+        self.match.move_token(2, 2, 3)
+        target_before = replace(self.target)
+        self.match.resolve_attack(1, 3, 0, timeline_cost=4)
+        self.assertEqual([u.id for u in self.match.tokens(0, 2, 3)], [2, 1])
+        self.assertEqual(self.target, target_before)
+        self.assertEqual((self.match.phase, self.match.round), (1, 1))
+
     def test_legacy_extra_shields_are_spent_consistently(self):
         self.target.shield_active = 7
         self.target.shield_spent = 1
@@ -73,7 +82,8 @@ class AttackResolutionTests(unittest.TestCase):
             store = MatchStore(path)
             try:
                 revision = store.save(self.match, 0)
-                self.assertTrue(self.match.resolve_attack(1, 3, 3, note='Beam Rifle'))
+                self.assertTrue(self.match.resolve_attack(1, 3, 3, timeline_cost=4, note='Beam Rifle'))
+                self.assertEqual(self.match.unit(1).round, self.catalog['EX02-U01'].timeline + 4)
                 self.assertEqual((self.target.hp, self.target.deployed, self.target.statuses),
                                  (self.target.card.hp, False, []))
                 self.assertEqual((self.target.energy, self.target.strength, self.target.speed, self.target.note),

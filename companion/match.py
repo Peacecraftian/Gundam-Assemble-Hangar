@@ -15,6 +15,18 @@ GARRISON_RESCUE = "Garrison rescue"
 GARRISON_POINTS = 2
 
 
+@dataclass(frozen=True)
+class GarrisonTarget:
+    id: int = 0  # Roster IDs start at 1.
+    label: str = "Enemy Garrison"
+    hp: int = 1
+    shield_active: int = 0
+    statuses: tuple = ()
+
+
+GARRISON = GarrisonTarget()
+
+
 def whole_number(value, label, minimum=None, maximum=None):
     try:
         if type(value) not in (int, str):
@@ -37,6 +49,51 @@ def attack_damage(hits, modifier, active_shields):
     incoming = max(0, hits + modifier)
     blocked = min(incoming, active_shields)
     return blocked, incoming - blocked
+
+
+def cycle_upgrade(match, unit_id, key):
+    """Acquire one upgrade, wrapping 8 to 0, without reactivating spent Shields."""
+    if key not in (*COUNTED_UPGRADES, 'shields'):
+        raise ValueError('Select an upgrade.')
+    if match.winner is not None:
+        return
+    unit = match.unit(unit_id)
+    if key != 'shields':
+        setattr(unit, key, 0 if getattr(unit, key) >= 8 else getattr(unit, key) + 1)
+        return
+    total = unit.shield_active + unit.shield_spent
+    if total >= 8:
+        unit.shield_active = unit.shield_spent = 0
+        unit.shield_slots = ['empty'] * SHIELD_SLOTS
+    else:
+        slots = list(unit.shields)
+        if 'empty' in slots:
+            slots[slots.index('empty')] = 'active'
+        unit.shield_active += 1
+        unit.shield_slots = slots
+
+
+def toggle_condition(match, unit_id, status):
+    match.adjust_unit_counter(unit_id, status, -1 if status in match.unit(unit_id).statuses else 1)
+
+
+@dataclass(frozen=True)
+class CombatDamage:
+    incoming: int
+    fracture_bonus: int
+    blocked: int
+    damage: int
+
+
+def combat_damage(hits, modifier, shields, fractured=False, weapon_bonus=0):
+    # Reuse the original public input validation; the Fracture bonus is an effect,
+    # not extra hits or part of the manually entered modifier's -99..99 limit.
+    attack_damage(hits, modifier, shields)
+    incoming = max(0, int(hits) + int(modifier) + whole_number(weapon_bonus, 'Weapon damage bonus', 0))
+    bonus = 3 if fractured and incoming >= 3 else 0
+    blocked = min(incoming + bonus, int(shields))
+    return CombatDamage(incoming, bonus, blocked, incoming + bonus - blocked)
+
 
 
 @dataclass
@@ -97,6 +154,8 @@ class Match:
     winner: int | None = None
     scenario_id: str | None = None
 
+    pending_attack: dict | None = None
+
     @classmethod
     def new(cls, players, scenario, phases, rosters, catalog, *, scenario_id=None):
         players = [player.strip() for player in players]
@@ -123,6 +182,8 @@ class Match:
 
     def to_json(self):
         payload = asdict(self)
+        if self.pending_attack is None:
+            del payload['pending_attack']
         if self.scenario_id is None:
             del payload["scenario_id"]
         for unit in payload["units"]:
@@ -194,6 +255,8 @@ class Match:
             counts["shield_spent"] = shield_slots.count("spent") + extra_spent
             if tuple(shield_slots) != unit.shields:
                 unit.shield_slots = list(shield_slots)
+        if not deployed and set(statuses) - set(unit.statuses):
+            raise ValueError('A unit in Reserve cannot gain a status effect.')
         unit.hp, unit.energy, unit.deployed = hp, energy, deployed
         if not deployed:
             unit.remote_weapon_hp.clear()
@@ -258,29 +321,94 @@ class Match:
         self._advance_token(unit, 2)
         unit.energy += 1
 
+    def blocked_deployment(self, unit_id):
+        unit = self.unit(unit_id)
+        if self.winner is not None or unit.deployed:
+            raise ValueError("Choose a Reserve unit in an active match.")
+        self._advance_token(unit, 2)
+        unit.energy += 1
+
     def dash_unit(self, unit_id):
         unit = self.unit(unit_id)
         self._require_deployed_action(unit)
         self._advance_token(unit, 2)
 
-    def resolve_attack(self, attacker_id, target_id, hits, *, modifier=0, note=""):
+    def consume_disarm(self, attacker_id):
+        try:
+            attacker = self.unit(attacker_id)
+        except StopIteration:
+            raise ValueError('Choose an attacker from this match.') from None
+        self._require_deployed_action(attacker)
+        if 'Disarm' not in attacker.statuses:
+            raise ValueError('Disarm changed. Close this roll and start a new attack.')
+        attacker.statuses.remove('Disarm')
+
+    def attack_target(self, target_id):
+        return GARRISON if target_id == GARRISON.id else self.unit(target_id)
+
+    def declare_attack(self, attacker_id, target_id, weapon, count, accuracy):
+        if self.pending_attack:
+            raise ValueError("Resume the declared attack or Undo it first.")
+        actor, target = self.unit(attacker_id), self.attack_target(target_id)
+        self._require_deployed_action(actor)
+        if target is not GARRISON:
+            self._require_deployed_action(target)
+            if actor.player == target.player:
+                raise ValueError("Choose an enemy target.")
+        count = whole_number(count, "Dice count", 0, 60)
+        accuracy = whole_number(accuracy, "Accuracy", -99, 99)
+        self._advance_token(actor, weapon.timeline)
+        self.pending_attack = dict(attacker=actor.id, target=target.id, weapon=weapon.name,
+                                   count=count, accuracy=accuracy, values=None,
+                                   disarmed="Disarm" in actor.statuses, finalized=False)
+
+    def save_attack_roll(self, values, accuracy, *, resolve_disarm=False):
+        attack = self.pending_attack
+        if not attack or attack["finalized"] or len(values) != attack["count"]:
+            raise ValueError("This roll does not match the declared attack.")
+        values = [whole_number(v, "Die", 1, 10) for v in values]
+        accuracy = whole_number(accuracy, "Accuracy", -99, 99)
+        if resolve_disarm:
+            self.consume_disarm(attack["attacker"])
+        attack.update(values=values, accuracy=accuracy, finalized=resolve_disarm)
+        self._attack_continuation = True
+
+    def resolve_attack(self, attacker_id, target_id, hits, *, timeline_cost=0, modifier=0, note="", weapon_bonus=0):
         """Apply one finalized weapon roll, including defeat, as one saved edit.
 
         Weapon/ability damage adjustments are adjudicated at the table before
-        Shields. Range, line of sight and the attacker's Timeline cost remain manual.
+        Fracture and Shields. Charge the selected weapon once, even on a miss.
         """
         try:
-            attacker, target = self.unit(attacker_id), self.unit(target_id)
+            attacker, target = self.unit(attacker_id), self.attack_target(target_id)
         except StopIteration:
             raise ValueError("Choose an attacker and target from this match.") from None
         self._require_deployed_action(attacker)
-        self._require_deployed_action(target)
-        if target.player == attacker.player:
+        if target is not GARRISON:
+            self._require_deployed_action(target)
+        if target is not GARRISON and target.player == attacker.player:
             raise ValueError("Choose a deployed enemy unit as the target.")
+        if 'Disarm' in attacker.statuses:
+            raise ValueError('Resolve Disarm before applying this attack.')
         phase = whole_number(self.phase, "Scoring Phase", 1, self.phases)
-        blocked, damage = attack_damage(hits, modifier, target.shield_active)
+        result = combat_damage(hits, modifier, target.shield_active, 'Fracture' in target.statuses, weapon_bonus)
+        cost = whole_number(timeline_cost, "Weapon TL cost", 0)
+        if self.pending_attack:
+            if (attacker_id, target_id) != (self.pending_attack['attacker'], self.pending_attack['target']):
+                raise ValueError("The declared attacker and target must match.")
+            self.pending_attack = None
+            self._attack_continuation = True
+        else:
+            self._advance_token(attacker, cost)
+        if target is GARRISON:
+            if result.damage:
+                self.record_garrison(attacker_id, phase, GARRISON_DEFEAT, note=note)
+            return bool(result.damage)
+        blocked, damage = result.blocked, result.damage
         for _ in range(blocked):
             self.adjust_shields(target, -1)
+        if result.fracture_bonus:
+            target.statuses.remove('Fracture')
         defeated = damage > 0 and damage >= target.hp
         if defeated:
             self.defeat_unit(target_id, phase, note=note)
@@ -304,19 +432,20 @@ class Match:
         unit.statuses.clear()
         unit.remote_weapon_hp.clear()
 
-    def record_garrison(self, unit_id, scoring_phase, reason, *, note=""):
+    def record_garrison(self, unit_id, scoring_phase, reason, *, note="", unpaid_tl=0):
         if reason not in (GARRISON_DEFEAT, GARRISON_RESCUE):
             raise ValueError("Choose Garrison defeat or Garrison rescue.")
         unit = self.unit(unit_id)
-        self._score_and_advance(unit, unit.player, scoring_phase, GARRISON_POINTS, reason, note)
+        self._score_and_advance(unit, unit.player, scoring_phase, GARRISON_POINTS, reason, note,
+                                2 if reason == GARRISON_RESCUE else whole_number(unpaid_tl, 'Unpaid TL', 0))
 
-    def _score_and_advance(self, unit, player, scoring_phase, points, reason, note):
+    def _score_and_advance(self, unit, player, scoring_phase, points, reason, note, cost=2):
         self._require_deployed_action(unit)
         scoring_phase = whole_number(scoring_phase, "Scoring Phase", 1, self.phases)
         reason = f"{reason} · {unit.label}"
         if note := note.strip():
             reason += f" · {note}"
-        self._advance_token(unit, 2)
+        self._advance_token(unit, cost)
         self.scores.append(ScoreEntry(player, scoring_phase, points, reason))
 
     def _require_deployed_action(self, unit):
@@ -337,6 +466,8 @@ class Match:
             self.adjust_shields(unit, delta)
         elif counter in STATUS_EFFECTS:
             if delta > 0 and counter not in unit.statuses:
+                if not unit.deployed:
+                    raise ValueError('A unit in Reserve cannot gain a status effect.')
                 unit.statuses = [status for status in STATUS_EFFECTS if status == counter or status in unit.statuses]
             elif delta < 0:
                 self.clear_unit_status(unit_id, counter)

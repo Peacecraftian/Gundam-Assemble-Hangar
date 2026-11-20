@@ -5,7 +5,7 @@ from math import ceil
 from PIL import Image, ImageDraw, ImageFilter, ImageOps, ImageSequence, ImageTk
 
 from .card_display import DISPLAY_SIZES, display_revision, load_display_image, published_bundle
-from .catalog import ASSETS, TACTICS_CARDS, UNIT_CARDS, load_card_image, published_number
+from .catalog import ASSETS, TACTICS_CARDS, UNIT_CARDS, card_source_directory, load_card_image, published_number, sortie_filename
 
 
 HANGAR_ART = ASSETS / "Video" / "Freight Lift.webp"
@@ -170,6 +170,35 @@ def _unit_preview_art(filename, _revision):
     return load_display_image(filename, "preview", folder=UNIT_CARDS)
 
 
+@lru_cache(maxsize=6)
+def sortie_art(filename, directory=ASSETS):
+    front = sortie_filename(filename)
+    if front:
+        try:
+            with Image.open(card_source_directory(directory, UNIT_CARDS) / front) as image:
+                return image.convert("RGBA")
+        except (OSError, Image.DecompressionBombError):
+            pass
+    return None
+
+
+def sortie_card(filename, size):
+    art = sortie_art(filename)
+    if art is None:
+        return fitted_card(filename, size)
+    return card_edge(ImageOps.contain(art, size, Image.Resampling.LANCZOS))
+
+
+def sortie_portrait(filename, size, angle=0):
+    art = sortie_art(filename)
+    if art is None:
+        return timeline_portrait(filename, size, angle)
+    # The lower third of the full-art front contains the printed stats.
+    portrait = ImageOps.fit(art.crop((0, 0, art.width, round(art.height * .65))), size,
+                            Image.Resampling.LANCZOS)
+    return portrait.rotate(angle, Image.Resampling.BICUBIC, expand=True) if angle else portrait
+
+
 def fitted_card(filename, size):
     if all(requested > cached for requested, cached in zip(size, DISPLAY_SIZES[UNIT_CARDS]["preview"])):
         art = card_art(filename)
@@ -249,6 +278,8 @@ def published_token_art(name, width):
 
 
 def scenario_token_art(name, width):
+    if name == "special-objective":
+        return published_token_art(name, width)
     if name == "objective":
         # Keep the marker visible in a source checkout before asset preparation.
         return published_token_art(name, width) or token_art("blue-objective", width)
