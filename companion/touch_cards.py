@@ -49,7 +49,7 @@ class TouchCardPreview(CardPreview):
         self.header = ttk.Frame(self, style='PanelFill.TFrame')
         self.header.pack(fill='x', pady=(0, 5))
         self.header.columnconfigure(1, weight=1)
-        self.title = ttk.Label(self.header, style='Preview.TLabel', width=-1)
+        self.title = ttk.Label(self.header, style='Preview.TLabel', width=1)
         self.title.grid(row=0, column=0, sticky='ew', padx=(0, 6))
         self.controls = ttk.Frame(self.header, style='PanelFill.TFrame')
         self.header_buttons = {}
@@ -88,7 +88,17 @@ class TouchCardPreview(CardPreview):
         self.meters = tk.Canvas(footer, background=RAIL, width=1, height=22, highlightthickness=0)
         self.meters.pack(side='left', fill='x', expand=True, padx=(0, 5))
         self.meters.bind('<Configure>', self.draw_meters)
-        self.remote_readouts = [RemoteWeaponReadout(self, app, weapon) for weapon in app.remote_weapons.values()]
+        squad_cards = {unit.card.number for unit in app.match.units}
+        self.remote_slot = ttk.Frame(self, style='PanelFill.TFrame')
+        self.remote_readouts = [RemoteWeaponReadout(self.remote_slot, app, weapon)
+                                for weapon in app.remote_weapons.values() if weapon.parent in squad_cards]
+        if self.remote_readouts:
+            # Place the contextual controls in a permanent row so showing or
+            # hiding a remote system cannot renegotiate the Timeline height.
+            button_height = max(button.winfo_reqheight() for row in self.remote_readouts
+                                for button in (row.deploy, row.damage, row.repair, row.status))
+            self.remote_slot.configure(height=button_height + 6)
+            self.remote_slot.pack(side='bottom', fill='x', pady=(3, 0))
         self.well = ttk.Frame(self, style='Recess.TFrame', padding=2)
         self.well.pack(fill='both', expand=True)
         self.well.columnconfigure(1, weight=1)
@@ -169,7 +179,9 @@ class TouchCardPreview(CardPreview):
                 self.photos[key] = icon
                 label.configure(image=icon)
         occupied = self.open_button.winfo_reqwidth() + self.controls.winfo_reqwidth() + 20
-        self.title.configure(text=fit_text(self.app.selected_unit().label, max(20, min(220, width - occupied)), self.face))
+        title_width = max(1, min(220, width - occupied))
+        self.header.columnconfigure(0, minsize=title_width + 6)
+        self.title.configure(text=fit_text(self.app.selected_unit().label, title_width, self.face))
 
     def acquire(self, key):
         unit_id = self.app.selected_id
@@ -219,9 +231,9 @@ class TouchCardPreview(CardPreview):
             if readout.weapon.parent == unit.card.number:
                 readout.update_state(unit, live)
                 if not readout.winfo_manager():
-                    readout.pack(side='bottom', fill='x', before=self.well, pady=(3, 0))
+                    readout.place(x=0, y=0, relwidth=1, relheight=1)
             else:
-                readout.pack_forget()
+                readout.place_forget()
         self.draw_meters()
         width, height = self.canvas.winfo_width(), self.canvas.winfo_height()
         self.canvas.delete('all')

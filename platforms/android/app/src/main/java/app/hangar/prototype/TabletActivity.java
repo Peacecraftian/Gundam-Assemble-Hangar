@@ -37,6 +37,7 @@ public final class TabletActivity extends Activity {
     private Button deploy, matchMenu, service, undo, finishMatch, attack, remote, previous, next;
     private CombatTray combat;
     private HangarReadouts hangars;
+    private boolean squadHasRemoteSystems;
     private ConsoleMenus menus;
     private final ArrayList<Button> unitActions = new ArrayList<>();
 
@@ -246,6 +247,13 @@ public final class TabletActivity extends Activity {
         if(wide)actions.addView(hangars.selectedMeters(),new LinearLayout.LayoutParams(0,dp(42),1));
         deploy=button(actions,"Deploy",this::deploySelected);
         attack=button(actions,"Attack",()->combat.attack(0));
+        squadHasRemoteSystems = false;
+        for (PyObject member : units()) {
+            if (!read("systems", member.get("id").toInt()).asList().isEmpty()) {
+                squadHasRemoteSystems = true;
+                break;
+            }
+        }
         remote=button(actions,"RWS",menus::remoteShortcut);remote.setContentDescription("RWS");
         Button viewCard=button(actions,"View Card",menus::fullCard);
         if(wide){
@@ -589,9 +597,14 @@ public final class TabletActivity extends Activity {
         service.setEnabled(true);
         java.util.List<PyObject> weapons=live && deployed?read("attacks",selected).asList():java.util.Collections.emptyList();
         card.setWeapons(weapons);
-        weaponHint.setVisibility(weapons.isEmpty()?View.GONE:View.VISIBLE);
+        weaponHint.setVisibility(weapons.isEmpty() ? View.INVISIBLE : View.VISIBLE);
         attack.setEnabled(!weapons.isEmpty());
-        remote.setVisibility(read("systems",selected).asList().isEmpty() ? View.GONE : View.VISIBLE);
+        // Keep the action row stable for matches that use a remote system.
+        if (squadHasRemoteSystems) {
+            remote.setVisibility(read("systems", selected).asList().isEmpty() ? View.INVISIBLE : View.VISIBLE);
+        } else {
+            remote.setVisibility(View.GONE);
+        }
         remote.setEnabled(live && deployed);
         remote.setText(menus.remoteLabel());
         for(Button b:goals) b.setEnabled(live);

@@ -34,13 +34,33 @@ class TouchResolutionTests(unittest.TestCase):
                 unit.deployed = True
             store.save(match, 0)
             app = Companion(root, catalog, store)
+            preview = app.preview
+
+            def bounds(widget):
+                return (widget.winfo_rootx(), widget.winfo_rooty(),
+                        widget.winfo_width(), widget.winfo_height())
+
+            def console_layout():
+                return (preview.card_box,) + tuple(bounds(widget) for widget in (
+                    root, app.track, *app.player_hangars, preview.canvas,
+                    preview.controls, preview.meters, preview.open_button))
+
+            def check_selection_layout():
+                original = console_layout()
+                for selected in (10, 8, 1):  # Aerial, Wing Zero, Gundam
+                    app.select_unit(selected)
+                    settle()
+                    self.assertEqual(console_layout(), original)
+                    self.assertEqual(any(row.winfo_ismapped() for row in preview.remote_readouts),
+                                     selected == 10)
+
             try:
                 for width, height in ((1366,688), (1366,768), (1920,1080)):
                     with self.subTest(viewport=(width,height)):
                         root.geometry(f'{width}x{height}+0+0')
                         root.deiconify()
                         settle()
-                        preview = app.preview
+                        check_selection_layout()
                         for button in (*preview.upgrade_buttons.values(), *preview.status_buttons.values()):
                             self.assertGreaterEqual(button.winfo_height(), 36)
                             self.assertGreaterEqual(button.winfo_width(), 36)
@@ -63,6 +83,7 @@ class TouchResolutionTests(unittest.TestCase):
                             dialog.window.destroy()
                 root.geometry('1020x595+0+0')
                 settle()
+                check_selection_layout()
                 self.assertEqual(app.preview.well.grid_rowconfigure(0, 'minsize'), 0)
             finally:
                 app.close()
